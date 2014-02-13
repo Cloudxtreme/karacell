@@ -52,47 +52,10 @@ Out:
 
   u32_idx_max=u32_idx_min+u32_count_minus_1;
 /*
-We expect the compiler to unroll this loop and aggregate stores. It's guaranteed to terminate because u32_idx_max!=ULONG_MAX. memset() causes a host of compiler problems and is less portable.
+We expect the compiler to unroll this loop and aggregate stores. It's guaranteed to terminate because u32_idx_max!=U32_MAX. memset() causes a host of compiler problems and is less portable.
 */
   for(u32_idx=u32_idx_min;u32_idx<=u32_idx_max;u32_idx++){
     u32_list_base[u32_idx]=0;
-  }
-  return;
-}
-
-void
-karacell_u32_list_copy(ULONG in_u32_idx_min,u32 *in_u32_list_base,ULONG out_u32_idx_min,u32 *out_u32_list_base,u32 u32_count_minus_1){
-/*
-Copy a contiguous sublist of list of (u32)s. Note that this function is intended for copying small structures; by design, it is NOT ULONG-abstract with respect to object size (but it is, with respect to object base index).
-
-In:
-
-  in_u32_idx_min is the index of the first u32 to read at in_u32_list_base, on [0,ULONG_MAX-1].
-
-  in_u32_list_base is the base of the source u32 list, writable for (in_u32_count_minus_1+1) (u32)s starting at index in_u32_idx_min.
-
-  out_u32_idx_min is the index of the first u32 to write at out_u32_list_base, on [0,ULONG_MAX-1].
-
-  out_u32_list_base is the base of the target u32 list, writable for (out_u32_count_minus_1+1) (u32)s starting at index out_u32_idx_min.
-
-  u32_count_minus_1 is number of (u32)s to copy, less 1, such that the above memory bounds are respected.
-
-Out:
-
-  *out_u32_list_base[out_u32_idx_min] is identical to in_u32_list_base[in_u32_idx_min] for all (u32_count_minus_1+1) (u32)s.
-*/
-  ULONG in_u32_idx;
-  ULONG out_u32_idx;
-  ULONG out_u32_idx_max;
-
-  out_u32_idx_max=out_u32_idx_min+u32_count_minus_1;
-  in_u32_idx=in_u32_idx_min;
-/*
-We expect the compiler to unroll this loop and aggregate stores. It's guaranteed to terminate because out_u32_idx_max!=ULONG_MAX. memcpy() causes a host of compiler problems and is less portable.
-*/
-  for(out_u32_idx=out_u32_idx_min;out_u32_idx<=out_u32_idx_max;out_u32_idx++){
-    out_u32_list_base[out_u32_idx]=in_u32_list_base[in_u32_idx];
-    in_u32_idx++;
   }
   return;
 }
@@ -810,7 +773,9 @@ Out:
   if(KARACELL_HASH_TYPE_NONE<hash_type){
     hash_xor_all_encrypted_base=&karacell_base->hash_xor_all[0];
     hash_u32_count_minus_1=karacell_base->hash_u32_count_minus_1_unencrypted;
-    karacell_u32_list_copy(0,hash_xor_all_encrypted_base,0,hash_xor_all_base,hash_u32_count_minus_1);
+    do{
+      hash_xor_all_base[hash_u32_count_minus_1]=hash_xor_all_encrypted_base[hash_u32_count_minus_1];
+    }while(hash_u32_count_minus_1--);
   }
   return;
 }
@@ -1354,9 +1319,13 @@ Out:
   karacell_base->header_base.iv is iv_base[iv_idx_min] for KARACELL_IV_U32_COUNT (u32)s.
 */
   karacell_header_t *header_base;
+  u32 iv_idx;
 
   header_base=karacell_base->header_base;
-  karacell_u32_list_copy(iv_idx_min,iv_base,0,&header_base->iv[0],KARACELL_IV_U32_COUNT-1);
+  for(iv_idx=0;iv_idx<=(KARACELL_IV_U32_COUNT-1);iv_idx++){
+    header_base->iv[iv_idx]=iv_base[iv_idx_min];
+    iv_idx_min++;
+  }
   return;
 }
 
@@ -1542,8 +1511,13 @@ Out:
 
   karacell_base->tumbler_idx_max is tumbler_idx_max.
 */
+  ULONG master_key_idx;
+
   karacell_base->tumbler_idx_max=tumbler_idx_max;
-  karacell_u32_list_copy(master_key_idx_min,master_key_base,0,&karacell_base->master_key[0],KARACELL_MASTER_KEY_U32_COUNT_MAX-1);
+  for(master_key_idx=0;master_key_idx<=(KARACELL_MASTER_KEY_U32_COUNT_MAX-1);master_key_idx++){
+    karacell_base->master_key[master_key_idx]=master_key_base[master_key_idx_min];
+    master_key_idx_min++;
+  }
   return;
 }
 

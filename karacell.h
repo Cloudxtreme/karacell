@@ -23,7 +23,6 @@ License version 3 along with the Karacell 3 Library (filename
 */
 #define KARACELL_BLOCK_SIZE (1<<KARACELL_BLOCK_SIZE_LOG2)
 #define KARACELL_BLOCK_SIZE_LOG2 (KARACELL_BLOCK_U32_COUNT_LOG2+U32_SIZE_LOG2)
-#define KARACELL_BLOCK_U16_COUNT (2<<KARACELL_BLOCK_U32_COUNT_LOG2)
 #define KARACELL_BLOCK_U32_COUNT (1<<KARACELL_BLOCK_U32_COUNT_LOG2)
 #define KARACELL_BLOCK_U32_COUNT_LOG2 10
 #define KARACELL_BLOCK_U64_COUNT (1<<KARACELL_BLOCK_U64_COUNT_LOG2)
@@ -55,8 +54,6 @@ TYPEDEF_START
 None of these fields are trustworthy, and all of them are required to be indistinguishable from noise. This structure must be a multiple of U64_SIZE for processing efficiency reasons, even though we measure its size in terms of (u32)s for convenience.
 */
   #define KARACELL_HEADER_U32_COUNT 14
-  #define KARACELL_HEADER_U16_COUNT (KARACELL_HEADER_U32_COUNT<<1)
-  #define KARACELL_HEADER_SIZE (KARACELL_HEADER_U32_COUNT<<2)
 /*
 If the IV field is wrong, then hash_xor_all (the hash footer after decryption, if present) won't work out. (If the hash isn't present, which is legal but potentially unsafe, os.c spits out an error upon decryption.) This field is source from sourced from something analagous to entropy_iv_make(), so it looks like noise.
 

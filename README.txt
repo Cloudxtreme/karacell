@@ -45,20 +45,20 @@ Run one of the build* files (see below). The output, karacell and demo executabl
 
 FILE SUMMARY
 
-[ascii.c]
+ascii.c
 
 ASCII conversion function for key importation from the command line.
 
-[build_a_clean.sh]
-[build_b_clean.bat]
+build_a_clean.sh
+build_b_clean.bat
 
 Cleaning files which delete everything in temp. Be careful to run them from within the karacell folder, and not from somewhere else!
  
-[build_c_linux32.sh]
-[build_d_linux64.sh]
-[build_e_mac_os32.sh]
-[build_f_mac_os64.sh]
-[build_g_win32.bat]
+build_c_linux32.sh
+build_d_linux64.sh
+build_e_mac_os32.sh
+build_f_mac_os64.sh
+build_g_win32.bat
 
 Build files for various OSes, named such that minimal command line tabbing is required. If building with MinGW under Windows, you'll see some innocuous warnings related to the .asm files. If you can't seem to run them in Linux, then either use chmod to add the executable attribute, or run via "/bin/sh [filename]".
 
@@ -76,107 +76,91 @@ Toggles IO pipelining. The idea is to allow disk (or network) IO in parallel wit
 
 Toggles multithreading support. Multithreading provides performance advantages, but may not be acceptable under some security regimes.
 
-[constant.h]
+constant.h
 
 Boring constants.
 
-[debug.c]
-[debug.h]
+debug.c
+debug.h
 
 Debug infrastructure (compile with -DDEBUG).
 
-[demo.c]
+demo.c
 
-Demo encryption xor mask construction. When you run temp/demo, you should get a pile of text ending in "Yay! It's correct." This is followed by tests of the list (string) cryption apparatus, which performs Karacell operations on memory regions as opposed to files.
+Demo encryption xor mask construction. When you run temp/demo, you should get a pile of text ending in "Yay! It's correct."
 
-[entropy.c]
+entropy.c
 
 Demo of entropy factory for the purpose of generating initial values for Karacell. NOT part of the Karacell spec.
 
-[file_sys.c]
-[file_sys.h]
+file_sys.c
+file_sys.h
 
 Boring file IO stuff.
 
-[flag.h]
+flag.h
 
 Build control.
 
-[jytter.asm]
-[jytter.h]
+jytter.asm
+jytter.h
 
 True random number generator for X86 and X64. http://jytter.blogspot.com
 
-[karacell.c]
-[karacell.h]
+karacell.c
+karacell.h
 
 Karacell 3 core functions and data structures. We don't provide a fully encapsulated encrypt_file() function because cryption should be divided into various threads across various processing stages, in the interest of performance. So the caller (os.c) does need to know a few things about how to (dis)assemble a Karacell file.
 
-[list.c]
-
-Functions used by u8.c, u16.c, and u32.c.
-
-[lmd2.c]
-[lmd2.h]
+lmd2.c
+lmd2.h
 
 Error detection library used to find accidental flaws in critical data structures.
 
-[lmd7.c]
-[lmd7.h]
-[lmd8.c]
-[lmd8.h]
+lmd7.c
+lmd7.h
+lmd8.c
+lmd8.h
 
 Secure hash libraries. http://leidich-message-digest.blogspot.com
 
-[mathematica.txt]
+mathematica.txt
 
 Cut-and-pastable Wolfram Mathematica Kernel source code which emulates demo.c using huge integers. Hopefully this will make our algo more accessible to mathematically minded hackers. Karacell only looks complicated because we're forced to use machine-sized integers and deal with annoying OS issues and exogenous hashes. It's mainly just a Marsaglia oscillator which selects rotations of an integer to add together, in order to form xor masks. So relax, already!
 
-[os.c]
+os.c
 
 OS interface which connects karacell.c to the command line. It knows only the minimum possible amount of information about Karacell file construction in order to do so.
 
-[print.c]
+print.c
 
 Stupid text printing functions.
 
-[spawn.c]
-[spawn.h]
+spawn.c
+spawn.h
 
 Multithreading library. http://spawnthread.blogspot.com
 
-[table.h]
+table.h
 
 The Karacell Table.
 
-[temp]
+temp
 
 Folder for emitted build files and executables.
 
-[timestamp.asm]
+timestamp.asm
 
 X86 and X64 CPU timestamp reader.
 
-[trng.c]
+trng.c
 
 Abstract interface from entropy.c to your true random number generator of choice.
 
-[tweak.h]
+tweak.h
 
 Performance tweaks.
 
-[u8.c]
-
-Functions for cryption of byte-granular lists (strings).
-
-[u16.c]
-
-Functions for cryption of u16-granular lists, for example, UNICODE.
-
-[u32.c]
-
-Functions for cryption of u32-granular lists.
-
-[unix_include.h]
+unix_include.h
 
 Standard UNIXy stuff.

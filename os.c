@@ -70,9 +70,9 @@ main(int argc, char *argv[]){
   FILE *handle_out;
   u8 hash_type;
   u32 hash_size;
-  u32 hash_xor_all_base[KARACELL_HASH_U32_COUNT_MAX];
+  u32 hash_xor_all[KARACELL_HASH_U32_COUNT_MAX];
   karacell_header_t *header_base;
-  u8 header_status;
+  u8 header_code;
   u32 *iv_base;
   karacell_t *karacell_base;
   u32 master_key_base[KARACELL_MASTER_KEY_U32_COUNT_MAX];
@@ -246,9 +246,9 @@ Go make *entropy_list_base in another thread, which will cause it to run faster 
         print_error_input_file();
         break;
       }
-      header_status=karacell_header_decrypt(&payload_size,&hash_size,karacell_base);
+      header_code=karacell_header_decrypt(&payload_size,&hash_size,karacell_base);
       status=1;
-      switch(header_status){
+      switch(header_code){
       case 0:
         status=0;
         break;
@@ -414,12 +414,12 @@ In practice, tune this switch statement so that only acceptably strong hashes re
 /*
 Read the encrypted hash.
 */
-        status=file_read(hash_size,(u8 *)(hash_xor_all_base),handle_in);
+        status=file_read(hash_size,(u8 *)(&hash_xor_all),handle_in);
         if(status){
           print_error_input_file();
           break;
         }
-        status=karacell_hash_xor_all_compare(hash_xor_all_base,karacell_base);
+        status=karacell_hash_xor_all_compare(&hash_xor_all[0],karacell_base);
         if(status){
           print_error("Hash does not match! Output file is corrupt");
           break;
@@ -436,8 +436,8 @@ The absence of an evaluable hash isn't a fatal error, but it's a problem that sh
 /*
 Write the encrypted hash.
 */
-        karacell_hash_xor_all_get(hash_xor_all_base,karacell_base);
-        status=file_write(hash_size,(u8 *)(hash_xor_all_base),handle_out);
+        karacell_hash_xor_all_get(&hash_xor_all[0],karacell_base);
+        status=file_write(hash_size,(u8 *)(&hash_xor_all),handle_out);
         if(status){
           print_error_output_file();
           break;
