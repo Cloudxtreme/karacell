@@ -24,7 +24,7 @@ The functions in this file are for demonstration purposes, and are not part of t
 #include "karacell.c"
 #include "trng.c"
 #include "entropy.c"
-#include "list.c"
+#include "listcrypt.c"
 #include "u16.c"
 #include "u32.c"
 #include "u8.c"
@@ -160,7 +160,7 @@ Because the mask is long and difficult to compare, just check its LMD2 against w
   }
   karacell_free_all(karacell_base);
 /*
-Now let's demo the use of cryption functions without the OS calls used in os.c. (There might be OS calls exclusively for multithreading, but even these can be disabled by building with PTHREAD_OFF as in flag.h.)
+Now let's demo the use of cryption functions without the OS calls used in main.c. (There might be OS calls exclusively for multithreading, but even these can be disabled by building with PTHREAD_OFF as in flag.h.)
 
 First, we need to generate some entropy, so read the warning in true_random_get(). The demo uses jytter, but modify trng.c as you see fit. Once this entropy pool has been generated, you can use it for all 2^64 possible values of file_idx, provided that no value is ever reused. In principle, you could save this entropy pool to secure storage, provided that it were ever only used with a single symmetric cryption peer. One direction of communication could then use even file_idx values, and the other could use odd values, but this is a higher level consideration beyond the scope of Karacell. Careful attention must be made to prevent replay attacks, for example, by xoring both peers' newly generated entropy pools each time file_idx falls out of sync.
 
@@ -184,8 +184,8 @@ Check to make sure memory allocation succeeded. This little section of code woul
     exit(1);
   }
 /*
-Now call karacell_tumbler_idx_max_get(). The best way is to do this once, upon master key (re)generation, in order to verify that it's a safe key to use, which is evidenced by nonzero tumbler_idx_max being returned. Then from that point onwards, just call it once after each karacell_init() in order to quickly recompute it without the hassle of reading it from secure storage. Needless to say, master_key_base must be filled in 
-/*
+Now call karacell_tumbler_idx_max_get(). The best way is to do this once, upon master key (re)generation, in order to verify that it's a safe key to use, which is evidenced by nonzero tumbler_idx_max being returned. Then from that point onwards, just call it once after each karacell_init() in order to quickly recompute it without the hassle of reading it from secure storage. Needless to say, master_key_base must be filled in.
+*/
   tumbler_idx_max=karacell_tumbler_idx_max_get(master_key_base);
 /*
 Here's the exception path to implement right after the first time a master key is (re)generated, as explained above. This code would not normally belong here, but at some do-it-once init that occurred long ago. So normally, we would just assume that tumbler_idx_max is safe, because it will always come back as the same value.
@@ -227,12 +227,12 @@ Let's encrypt the u32 list in the index range [51,9955]. In other words, u32_idx
 /*
 Take a quick LMD2 of the unencrypted substring, so we can verify that it decrypts properly after encryption.
 */
-  lmd2=LMD_STRING_LMD2_GET((u8 *)(&u32_list_base[u32_idx_min]),0,u32_count<<U32_SIZE_LOG2);
-  status=karacell_u32_list_crypt(entropy_list_base,file_idx,karacell_base,&hash_type,&u32_count,u32_idx_min,u32_list_base,&unauthenticated_status);
+  lmd2=LMD_STRING_LMD2_GET((u8 *)(&u32_list_base[u32_idx_min]),0,(u32)(u32_count<<U32_SIZE_LOG2));
+  status=listcrypt_u32_list_crypt(entropy_list_base,file_idx,karacell_base,&hash_type,&u32_count,u32_idx_min,u32_list_base,&unauthenticated_status);
 /*
 (Note that hash_type, u32_count, and unauthenticated_status are not modified by encryption, only decryption.)
 
-Since encryption is not allowed to allocate memory, the following exception code should never occur, but in theory, it could if you provided karacell_u32_list_crypt() with bad inputs.
+Since encryption is not allowed to allocate memory, the following exception code should never occur, but in theory, it could if you provided listcrypt_u32_list_crypt() with bad inputs.
 */
   if(status){
     print_error("32-bit encryption failed");
@@ -258,7 +258,7 @@ Now decrypt this junk. Back up u32_idx_min and adjust u32_count to reflect an en
 Set hash_type==0 in order to say that we want to decrypt.
 */
   hash_type=0;
-  status=karacell_u32_list_crypt(entropy_list_base,file_idx,karacell_base,&hash_type,&u32_count,u32_idx_min,u32_list_base,&unauthenticated_status);
+  status=listcrypt_u32_list_crypt(entropy_list_base,file_idx,karacell_base,&hash_type,&u32_count,u32_idx_min,u32_list_base,&unauthenticated_status);
 /*
 The following exception code could occur in real life, most likely due to karacell_header_decrypt() finding a consistency check failure in the header, or the hash failing to verify.
 */
@@ -279,7 +279,7 @@ Rewrite this exception code to suit your application:
 Check that the decrypted message is correct. Ignore the header and hash, because the hash has already verified.
 */
   u32_idx_min+=KARACELL_HEADER_U32_COUNT;
-  lmd2-=LMD_STRING_LMD2_GET((u8 *)(&u32_list_base[u32_idx_min]),0,u32_count<<U32_SIZE_LOG2);
+  lmd2-=LMD_STRING_LMD2_GET((u8 *)(&u32_list_base[u32_idx_min]),0,(u32)(u32_count<<U32_SIZE_LOG2));
   if(!lmd2){
     printf("32-bit cryption test passed.\n");
   }else{
@@ -317,11 +317,11 @@ Set up some random base index and cryption region size.
 /*
 Take an LMD2 for verification purposes below.
 */
-  lmd2=LMD_STRING_LMD2_GET((u8 *)(&u16_list_base[u16_idx_min]),0,u16_count<<U16_SIZE_LOG2);
+  lmd2=LMD_STRING_LMD2_GET((u8 *)(&u16_list_base[u16_idx_min]),0,(u32)(u16_count<<U16_SIZE_LOG2));
 /*
-Notice how the format of karacell_u16_list_crypt() mirrors karacell_u32_list_crypt(), but for the trivial type difference.
+Notice how the format of listcrypt_u16_list_crypt() mirrors listcrypt_u32_list_crypt(), but for the trivial type difference.
 */
-  status=karacell_u16_list_crypt(entropy_list_base,file_idx,karacell_base,&hash_type,&u16_count,u16_idx_min,u16_list_base,&unauthenticated_status);
+  status=listcrypt_u16_list_crypt(entropy_list_base,file_idx,karacell_base,&hash_type,&u16_count,u16_idx_min,u16_list_base,&unauthenticated_status);
   if(status){
     print_error("16-bit encryption failed");
     exit(1);
@@ -337,7 +337,7 @@ Do the same hack to copy the encrypted header and encrypted hash to the header a
   u16_idx_min-=KARACELL_HEADER_U16_COUNT;
   u16_count+=KARACELL_HEADER_U16_COUNT+(LMD7_U32_COUNT<<1);
   hash_type=0;
-  status=karacell_u16_list_crypt(entropy_list_base,file_idx,karacell_base,&hash_type,&u16_count,u16_idx_min,u16_list_base,&unauthenticated_status);
+  status=listcrypt_u16_list_crypt(entropy_list_base,file_idx,karacell_base,&hash_type,&u16_count,u16_idx_min,u16_list_base,&unauthenticated_status);
   if(status){
     print_error("16-bit decryption failed");
     exit(1);
@@ -347,7 +347,7 @@ Do the same hack to copy the encrypted header and encrypted hash to the header a
     exit(1);
   }
   u16_idx_min+=KARACELL_HEADER_U16_COUNT;
-  lmd2-=LMD_STRING_LMD2_GET((u8 *)(&u16_list_base[u16_idx_min]),0,u16_count<<U16_SIZE_LOG2);
+  lmd2-=LMD_STRING_LMD2_GET((u8 *)(&u16_list_base[u16_idx_min]),0,(u32)(u16_count<<U16_SIZE_LOG2));
   if(!lmd2){
     printf("16-bit cryption test passed.\n");
   }else{
@@ -374,8 +374,8 @@ Do it once more, this time for a u8 list with an LMD8 hash.
 /*
 Take an LMD2 for verification purposes below.
 */
-  lmd2=LMD_STRING_LMD2_GET((u8 *)(&u8_list_base[u8_idx_min]),0,u8_count);
-  status=karacell_u8_list_crypt(entropy_list_base,file_idx,karacell_base,&hash_type,&u8_count,u8_idx_min,u8_list_base,&unauthenticated_status);
+  lmd2=LMD_STRING_LMD2_GET((u8 *)(&u8_list_base[u8_idx_min]),0,(u32)(u8_count));
+  status=listcrypt_u8_list_crypt(entropy_list_base,file_idx,karacell_base,&hash_type,&u8_count,u8_idx_min,u8_list_base,&unauthenticated_status);
   if(status){
     print_error("8-bit encryption failed");
     exit(1);
@@ -385,7 +385,7 @@ Take an LMD2 for verification purposes below.
   u8_idx_min-=KARACELL_HEADER_SIZE;
   u8_count+=KARACELL_HEADER_SIZE+LMD8_SIZE;
   hash_type=0;
-  status=karacell_u8_list_crypt(entropy_list_base,file_idx,karacell_base,&hash_type,&u8_count,u8_idx_min,u8_list_base,&unauthenticated_status);
+  status=listcrypt_u8_list_crypt(entropy_list_base,file_idx,karacell_base,&hash_type,&u8_count,u8_idx_min,u8_list_base,&unauthenticated_status);
   if(status){
     print_error("8-bit decryption failed");
     exit(1);
@@ -395,7 +395,7 @@ Take an LMD2 for verification purposes below.
     exit(1);
   }
   u8_idx_min+=KARACELL_HEADER_SIZE;
-  lmd2-=LMD_STRING_LMD2_GET((u8 *)(&u8_list_base[u8_idx_min]),0,u8_count);
+  lmd2-=LMD_STRING_LMD2_GET((u8 *)(&u8_list_base[u8_idx_min]),0,(u32)(u8_count));
   if(!lmd2){
     printf("8-bit cryption test passed.\n");
   }else{

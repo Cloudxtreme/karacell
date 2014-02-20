@@ -2,7 +2,7 @@
 Leidich Message Digest
 http://leidich-message-digest.blogspot.com
 Copyright 2013 Russell Leidich
-March 2, 2013
+September 17, 2013
 
 This file is part of the Leidich Message Digest Library.
 
@@ -36,8 +36,8 @@ which implies that the cycle lengths of the iterations (x,c)-->((LMD8_A0*x+c) MO
 
 The exponents above are defined as follows:
 */
-#define LMD8_D0 0x9C20E342
-#define LMD8_D1 0xD28CC42E
+#define LMD8_D0 0x9C20E342UL
+#define LMD8_D1 0xD28CC42EUL
 #define LMD8_BIT_COUNT (1<<(LMD8_SIZE_LOG2+U8_BITS_LOG2))
 #define LMD8_BLOCK_SIZE 0x1000
 #define LMD8_BLOCK_U32_COUNT (LMD8_BLOCK_SIZE>>U32_SIZE_LOG2)

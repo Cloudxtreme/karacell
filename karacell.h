@@ -2,7 +2,6 @@
 Karacell 3 Library
 Copyright 2013 Tigerspike Ltd
 http://karacell.info
-May 1, 2013
 
 This collection of files constitutes the Karacell 3 Library. (This is a
 library in the abstact sense; it's not intended to compile to a ".lib"
@@ -23,7 +22,7 @@ License version 3 along with the Karacell 3 Library (filename
 */
 #define KARACELL_BLOCK_SIZE (1<<KARACELL_BLOCK_SIZE_LOG2)
 #define KARACELL_BLOCK_SIZE_LOG2 (KARACELL_BLOCK_U32_COUNT_LOG2+U32_SIZE_LOG2)
-#define KARACELL_BLOCK_U16_COUNT (2<<KARACELL_BLOCK_U32_COUNT_LOG2)
+#define KARACELL_BLOCK_U16_COUNT (1<<(KARACELL_BLOCK_U32_COUNT_LOG2+1))
 #define KARACELL_BLOCK_U32_COUNT (1<<KARACELL_BLOCK_U32_COUNT_LOG2)
 #define KARACELL_BLOCK_U32_COUNT_LOG2 10
 #define KARACELL_BLOCK_U64_COUNT (1<<KARACELL_BLOCK_U64_COUNT_LOG2)
@@ -56,9 +55,9 @@ None of these fields are trustworthy, and all of them are required to be indisti
 */
   #define KARACELL_HEADER_U32_COUNT 14
   #define KARACELL_HEADER_U16_COUNT (KARACELL_HEADER_U32_COUNT<<1)
-  #define KARACELL_HEADER_SIZE (KARACELL_HEADER_U32_COUNT<<2)
+  #define KARACELL_HEADER_SIZE (KARACELL_HEADER_U32_COUNT<<U32_SIZE_LOG2)
 /*
-If the IV field is wrong, then hash_xor_all (the hash footer after decryption, if present) won't work out. (If the hash isn't present, which is legal but potentially unsafe, os.c spits out an error upon decryption.) This field is source from sourced from something analagous to entropy_iv_make(), so it looks like noise.
+If the IV field is wrong, then hash_xor_all (the hash footer after decryption, if present) won't work out. (If the hash isn't present, which is legal but potentially unsafe, main.c spits out an error upon decryption.) This field is source from sourced from something analagous to entropy_iv_make(), so it looks like noise.
 
 Everything beyond the IV is encrypted with block_idx==0 (block_idx==1 being the first data block), as though must_decrypt_to_zero were located at offset 0 of block 0, so that takes care of the noise requirement. In order to minimize communication latency, the fields are not covered by hash_xor_all, so code should behave under the assumption that they may have been maliciously modified.
 */

@@ -2,7 +2,6 @@
 Karacell 3 Library
 Copyright 2013 Tigerspike Ltd
 http://karacell.info
-October 11, 2013
 
 This collection of files constitutes the Karacell 3 Library. (This is a
 library in the abstact sense; it's not intended to compile to a ".lib"
@@ -33,13 +32,13 @@ const u64 karacell_table_base[KARACELL_TABLE_U64_COUNT]={KARACELL_TABLE};
 void
 karacell_u32_list_zero(u32 u32_count_minus_1,ULONG u32_idx_min,u32 *u32_list_base){
 /*
-Zero a contiguous sublist of list of (u32)s. Note that this function is intended for zeroing small structures; by design, it is NOT ULONG-abstract with respect to object size (but it is, with respect to object base index).
+Zero a contiguous list of (u32)s. Note that this function is intended for zeroing small structures; by design, it is NOT ULONG-abstract with respect to object size (but it is, with respect to object base index).
 
 In:
 
   u32_count_minus_1 is number of (u32)s to set to 0, less 1, on [0,(ULONG_MAX-1)-u32_idx_min].
 
-  u32_idx_min is the first index to 0, on [0,ULONG_MAX-1].
+  u32_idx_min is the first index to 0.
 
   *u32_list_base is writable for (u32_count_minus_1+1) (u32)s starting at index u32_idx_min.
 
@@ -63,19 +62,19 @@ We expect the compiler to unroll this loop and aggregate stores. It's guaranteed
 void
 karacell_u32_list_copy(ULONG in_u32_idx_min,u32 *in_u32_list_base,ULONG out_u32_idx_min,u32 *out_u32_list_base,u32 u32_count_minus_1){
 /*
-Copy a contiguous sublist of list of (u32)s. Note that this function is intended for copying small structures; by design, it is NOT ULONG-abstract with respect to object size (but it is, with respect to object base index).
+Copy a contiguous list of (u32)s. Note that this function is intended for copying small structures; by design, it is NOT ULONG-abstract with respect to object size (but it is, with respect to object base index).
 
 In:
 
-  in_u32_idx_min is the index of the first u32 to read at in_u32_list_base, on [0,ULONG_MAX-1].
+  in_u32_idx_min is the index of the first u32 to read at in_u32_list_base.
 
-  in_u32_list_base is the base of the source u32 list, writable for (in_u32_count_minus_1+1) (u32)s starting at index in_u32_idx_min.
+  in_u32_list_base is the base of the source u32 list, writable for (u32_count_minus_1+1) (u32)s starting at index in_u32_idx_min.
 
-  out_u32_idx_min is the index of the first u32 to write at out_u32_list_base, on [0,ULONG_MAX-1].
+  out_u32_idx_min is the index of the first u32 to write at out_u32_list_base.
 
-  out_u32_list_base is the base of the target u32 list, writable for (out_u32_count_minus_1+1) (u32)s starting at index out_u32_idx_min.
+  out_u32_list_base is the base of the target u32 list, writable for (u32_count_minus_1+1) (u32)s starting at index out_u32_idx_min.
 
-  u32_count_minus_1 is number of (u32)s to copy, less 1, such that the above memory bounds are respected.
+  u32_count_minus_1 is number of (u32)s to copy, less 1, on [0,(ULONG_MAX-1)-MAX(in_u32_idx_min,out_u32_idx_min)].
 
 Out:
 
@@ -803,7 +802,7 @@ Out:
   *hash_xor_all_base is karacell->hash_xor_all for (karacell_base->hash_u32_count_minus_1_unencrypted+1) (u32)s.
 */
   u8 hash_type;
-  ULONG hash_u32_count_minus_1;
+  u32 hash_u32_count_minus_1;
   u32 *hash_xor_all_encrypted_base;
 
   hash_type=karacell_base->hash_type_unencrypted;

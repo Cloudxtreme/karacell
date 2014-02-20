@@ -2,7 +2,6 @@
 Karacell 3 Library
 Copyright 2013 Tigerspike Ltd
 http://karacell.info
-October 17, 2013
 
 This collection of files constitutes the Karacell 3 Library. (This is a
 library in the abstact sense; it's not intended to compile to a ".lib"
@@ -23,13 +22,17 @@ License version 3 along with the Karacell 3 Library (filename
 */
 REQUIREMENTS
 
-GCC is required for all except Windows, for which you need MinGW (http://mingw.org) for the CMD command shell. Cygwin is not recommended.
+An X86 or X64 CPU is required. See PORTING for migration to other architectures.
 
-NASM 2.09.10 or better is also required (http://nasm.us). Supports only X86 and X64 architectures. On Linux:
+For Linux, you need GCC. For Windows, you need MinGW (http://mingw.org) for the CMD command shell. Cygwin is not recommended. For MacOS, you need clang.
+
+NASM 2.09.10 or better is also required (http://nasm.us) for systems with an X86 or X64 CPU. On Linux use:
 
   sudo apt-get install nasm
 
-Porting Karacell to other CPUs should be fairly easy. You need to consider at least: (1) "-mtune=native" as opposed to "-m32" or "-m64", (2) jytter.asm, and (3) the interaction between FTELLO, FSEEKO, and _FILE_OFFSET_BITS.
+PORTING
+
+Porting Karacell to other CPUs should be fairly easy. You need to consider at least: (1) porting jytter.asm or modifying trng.c to use some other true random number generator, (2) compiling with "-mtune=native" as opposed to "-m32" or "-m64", and (3) the interaction between FTELLO, FSEEKO, and _FILE_OFFSET_BITS.
 
 RUNNING
 
@@ -80,6 +83,10 @@ Toggles multithreading support. Multithreading provides performance advantages, 
 
 Boring constants.
 
+[COPYING]
+
+Required for distribution.
+
 [debug.c]
 [debug.h]
 
@@ -87,7 +94,7 @@ Debug infrastructure (compile with -DDEBUG).
 
 [demo.c]
 
-Demo encryption xor mask construction. When you run temp/demo, you should get a pile of text ending in "Yay! It's correct." This is followed by tests of the list (string) cryption apparatus, which performs Karacell operations on memory regions as opposed to files.
+Demo encryption xor mask construction. When you run temp/demo, you should get a pile of text ending in "Yay! It's correct." This is followed by tests of the list (string) cryption apparatus, which performs Karacell operations on memory regions as opposed to files. These tests are well commented so as to illustrate the use of said list cryption functions.
 
 [entropy.c]
 
@@ -110,9 +117,11 @@ True random number generator for X86 and X64. http://jytter.blogspot.com
 [karacell.c]
 [karacell.h]
 
-Karacell 3 core functions and data structures. We don't provide a fully encapsulated encrypt_file() function because cryption should be divided into various threads across various processing stages, in the interest of performance. So the caller (os.c) does need to know a few things about how to (dis)assemble a Karacell file.
+Karacell 3 core functions and data structures. We don't provide a fully encapsulated encrypt_file() function because Karacell needs to be divorced from TRNG architecture, the latter being hardware dependent. There are other design considerations as well, namely: (1) multithreading (handled transparently via the PTHREAD(_OFF) build constants) and (2) the decision to construct xor masks (a) immediately (JIT) after data arrives (higher latency requiring only a local secret entropy pool) or (b) speculatively (see PIPELINE(_OFF) in flag.h, which is used only for demo purposes but should operate correctly) prior to arrival (lower latency, but requiring an entropy pool shared with all peers and resynchonized after each power failure in such a manner as to prevent replay attacks). Most architectures will probably perform best with monothreading (which keeps other cores available for more urgent tasks) and JIT mask construction.
 
-[list.c]
+However, a simplified JIT cryption interface is provided in u8.c, u16.c, and u32.c.
+
+[listcrypt.c]
 
 Functions used by u8.c, u16.c, and u32.c.
 
@@ -128,13 +137,13 @@ Error detection library used to find accidental flaws in critical data structure
 
 Secure hash libraries. http://leidich-message-digest.blogspot.com
 
+[main.c]
+
+OS interface which connects karacell.c to the command line. It knows only the minimum possible amount of information about Karacell file construction in order to do so. The name only refers to its status as the root compilation file for the executable, and is not required if calling the listcrypt functions via u8.c, u16.c, or u32.c.
+
 [mathematica.txt]
 
 Cut-and-pastable Wolfram Mathematica Kernel source code which emulates demo.c using huge integers. Hopefully this will make our algo more accessible to mathematically minded hackers. Karacell only looks complicated because we're forced to use machine-sized integers and deal with annoying OS issues and exogenous hashes. It's mainly just a Marsaglia oscillator which selects rotations of an integer to add together, in order to form xor masks. So relax, already!
-
-[os.c]
-
-OS interface which connects karacell.c to the command line. It knows only the minimum possible amount of information about Karacell file construction in order to do so.
 
 [print.c]
 

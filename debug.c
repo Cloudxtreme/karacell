@@ -2,7 +2,6 @@
 Karacell 3 Library
 Copyright 2013 Tigerspike Ltd
 http://karacell.info
-October 17, 2013
 
 This collection of files constitutes the Karacell 3 Library. (This is a
 library in the abstact sense; it's not intended to compile to a ".lib"

@@ -2,7 +2,6 @@
 Karacell 3 Library
 Copyright 2013 Tigerspike Ltd
 http://karacell.info
-October 17, 2013
 
 This collection of files constitutes the Karacell 3 Library. (This is a
 library in the abstact sense; it's not intended to compile to a ".lib"
@@ -24,7 +23,7 @@ License version 3 along with the Karacell 3 Library (filename
 /*
 Build control. If possible, change the build using gcc command switches, and not by changing this file.
 */
-#define BUILD_NUMBER 155
+#define BUILD_NUMBER 159
 #define BUILD_NUMBER_NEEDED_TO_DECODE 131
 #if !(defined(_32_)||defined(_64_))
   #error "Use 'gcc -D_64_' for 64-bit or 'gcc -D_32_' for 32-bit code."
