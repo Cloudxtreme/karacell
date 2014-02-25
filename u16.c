@@ -214,7 +214,7 @@ This code is equivalent to listcrypt_u32_list_crypt() with adaptations for conve
           if(decrypt_status){
             karacell_hash_get(0,karacell_base,thread_base,0,block_base,KARACELL_BLOCK_SIZE);
           }
-          karacell_hash_xor(hash_base,hash_u32_count_minus_1,hash_xor_all_base);
+          karacell_hash_xor(hash_base,(u8)(hash_u32_count_minus_1),hash_xor_all_base);
         }
       }
       payload_size-=(ULONG)(payload_block_idx_max)<<KARACELL_BLOCK_SIZE_LOG2;

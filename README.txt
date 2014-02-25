@@ -24,7 +24,7 @@ REQUIREMENTS
 
 An X86 or X64 CPU is required. See PORTING for migration to other architectures.
 
-For Linux, you need GCC. For Windows, you need MinGW (http://mingw.org) for the CMD command shell. Cygwin is not recommended. For MacOS, you need clang.
+For Linux, you need GCC. For Windows, you need MinGW (http://mingw.org) for the CMD command shell. Cygwin is not supported. For MacOS, you need clang.
 
 NASM 2.09.10 or better is also required (http://nasm.us) for systems with an X86 or X64 CPU. On Linux use:
 
