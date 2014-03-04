@@ -49,13 +49,6 @@ The functions in this file are for demonstration purposes, and are not part of t
 #include "trng.c"
 #include "entropy.c"
 #include "ascii.c"
-#ifdef DEBUG
-  #ifdef _32_
-    extern void timestamp_get(uint64_t *timestamp_base) __attribute__((fastcall));
-  #else
-    extern void timestamp_get(uint64_t *timestamp_base);
-  #endif
-#endif
 
 int
 main(int argc, char *argv[]){
@@ -85,23 +78,18 @@ main(int argc, char *argv[]){
   ULONG precrypt_block_idx_max;
   u8 status;
   spawn_t *spawn_base;
-  #ifdef DEBUG
-    u64 timestamp_delta;
-    u64 timestamp_end;
-    u64 timestamp_start;
-  #endif
   u8 tumbler_idx_max;
 
-  #ifdef DEBUG
-    timestamp_get(&timestamp_start);
-  #endif
   status=1;
+  decrypt_status=0;
   authentication_fail_status=0;
   entropy_spawn_status=0;
+  precrypt_block_idx_max=0;
   handle_in=NULL;
   handle_out=NULL;
   karacell_base=NULL;
   payload_base=NULL;
+  spawn_base=NULL;
   do{
     #ifndef DEBUG
       if(argc!=6){
@@ -154,7 +142,7 @@ main(int argc, char *argv[]){
     mode_base=(u8 *)(argv[1]);
     mode=mode_base[0];
     status=!mode;
-    mode-='0';
+    mode=(u8)(mode-'0');
 /*
 If mode was null then we can't read the memory at mode_base[1], so be careful. If it's out of range, set status.
 */
@@ -176,8 +164,8 @@ If mode was null then we can't read the memory at mode_base[1], so be careful. I
     }
     overwrite_status_base=(u8 *)(argv[2]);
     overwrite_status=overwrite_status_base[0];
-    status|=!overwrite_status;
-    overwrite_status-='0';
+    status=(u8)(status|(!overwrite_status));
+    overwrite_status=(u8)(overwrite_status-'0');
 /*
 If overwrite_status was null then we can't read the memory at overwrite_status_base[1], so be careful. If it's out of range, set status.
 */
@@ -186,14 +174,14 @@ If overwrite_status was null then we can't read the memory at overwrite_status_b
     }
     status|=ascii_master_key_get(master_key_base,(u8 *)(argv[3]));
     tumbler_idx_max=karacell_tumbler_idx_max_get(master_key_base);
-    status|=!tumbler_idx_max;
+    status=(u8)(status|(!tumbler_idx_max));
     if(status){
       print_error("Bad syntax. (Illegal or weak key, perhaps?) Run again with no parameters");
       break;
     }
     status=1;
     DEBUG_STRING_PRINT("master_key",KARACELL_MASTER_KEY_U32_COUNT_MAX,(u8 *)(master_key_base),2);
-    DEBUG_U8("tumbler_count",tumbler_idx_max+1);
+    DEBUG_U8("tumbler_count",(u8)(tumbler_idx_max+1));
     if(!overwrite_status){
       handle_out=file_open((u8 *)(argv[5]),FILE_READ);
       if(handle_out){
@@ -288,7 +276,7 @@ Don't count the tail block, which we'll crypt serially below.
 */
       precrypt_block_idx_max=KARACELL_BLOCKS_PER_BURST-1;
       if(payload_block_idx_max<=precrypt_block_idx_max){
-        precrypt_block_idx_max=payload_block_idx_max;
+        precrypt_block_idx_max=(ULONG)(payload_block_idx_max);
       }
 /*
 Try to allocate enough space for the desired burst size. Just take whatever we can get.
@@ -332,7 +320,7 @@ Set file_idx==0 because this is the only file that will be encrypted with this e
     block_idx_minus_1=0;
     while(KARACELL_BLOCK_SIZE<payload_size){
       if(payload_size<burst_size){
-        precrypt_block_idx_max=(payload_size-1)>>KARACELL_BLOCK_SIZE_LOG2;
+        precrypt_block_idx_max=(ULONG)((payload_size-1)>>KARACELL_BLOCK_SIZE_LOG2);
 /*
 Don't count the tail block, which we'll crypt serially below.
 */
@@ -460,9 +448,6 @@ If we were going to crypt another file, we would need to call karacell_rewind() 
       DEBUG_U64("mallocs_minus_frees",karacell_allocation_count);
       status=1;
     }
-    timestamp_get(&timestamp_end);
-    timestamp_delta=timestamp_end-timestamp_start;
-    DEBUG_U64("timer_ticks_elapsed",timestamp_delta);
   #endif
   fflush(stdout);
   if((!status)&&authentication_fail_status){

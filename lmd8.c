@@ -77,7 +77,7 @@ Out:
       c=p_base[j+(LMD8_U32_COUNT>>1)];
       x=(u32)(product);
       carry0=(c<x);
-      carry0+=product>>U32_BITS;
+      carry0+=(u32)(product>>U32_BITS);
       p_base[j]=c-x;
     }
     x=x_base[0];
@@ -117,7 +117,7 @@ Out:
       c=p_base[j+(LMD8_U32_COUNT>>1)];
       x=(u32)(product);
       carry0=(c<x);
-      carry0+=product>>U32_BITS;
+      carry0+=(u32)(product>>U32_BITS);
       p_base[j]=c-x;
     }
     x=x_base[0];

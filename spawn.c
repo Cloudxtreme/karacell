@@ -1,9 +1,9 @@
 /*
 Spawn Library
 http://spawnthread.blogspot.com
-Copyright 2013 Tigerspike Ltd
+Copyright 2013-2014 Tigerspike Ltd
 http://tigerspike.com
-April 25, 2013
+March 2, 2014
 
 This collection of files constitutes the Spawn Library. (This is a
 library in the abstact sense; it's not intended to compile to a ".lib"
@@ -319,7 +319,10 @@ Out:
     simulthread_list_size=simulthread_idx_max;
     simulthread_list_size++;
     simulthread_list_size*=sizeof(spawn_simulthread_t);
-    simulthread_list_base=(spawn_simulthread_t *)(spawn_malloc(simulthread_list_size-1));
+    simulthread_list_base=NULL;
+    if(simulthread_list_size<=ULONG_MAX){
+      simulthread_list_base=(spawn_simulthread_t *)(spawn_malloc((ULONG)(simulthread_list_size-1)));
+    }
     spawn_base=NULL;
     if(simulthread_list_base){
       spawn_base=(spawn_t *)(spawn_malloc(sizeof(spawn_t)-1));

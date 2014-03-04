@@ -37,6 +37,7 @@ Out:
 */
   char *mode_string_base;
 
+  mode_string_base=NULL;
   switch(mode){
   case FILE_READ:
     mode_string_base="rb";

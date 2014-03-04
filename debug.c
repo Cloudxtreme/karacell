@@ -59,12 +59,12 @@ debug_string_print_custom(char *context_string_base,u32 chunk_count,u8 *string_b
       column_count=0x10;
       if(chunk_size_log2>1){
         row_count++;
-        column_count<<=1;
+        column_count=(u8)(column_count<<1);
       }
       row_count-=chunk_size_log2;
-      row_count=(chunk_count>>row_count)+(!!(chunk_count&((1<<row_count)-1)));
-      column_count>>=chunk_size_log2;
-      k_delta=1<<chunk_size_log2;
+      row_count=(chunk_count>>row_count)+(!!(chunk_count&((u32)(1<<row_count)-1)));
+      column_count=(u8)(column_count>>chunk_size_log2);
+      k_delta=(u32)(1<<chunk_size_log2);
       char_array_idx_delta=(u8)((k_delta<<1)+1);
       if(backwards==0){
         k=0;
@@ -81,7 +81,7 @@ debug_string_print_custom(char *context_string_base,u32 chunk_count,u8 *string_b
           if(compilable){
             char_array_base[char_array_idx]='0';
             char_array_base[char_array_idx+1]='x';
-            char_array_idx+=2;
+            char_array_idx=(u8)(char_array_idx+2);
           }
           switch(chunk_size_log2){
           case 0:
@@ -97,7 +97,7 @@ debug_string_print_custom(char *context_string_base,u32 chunk_count,u8 *string_b
             sprintf((char *)(char_array_base+char_array_idx),"%08X%08X,",*(u32 *)(string_base+k+U32_SIZE),*(u32 *)(string_base+k));
             break;
           }
-          char_array_idx+=char_array_idx_delta;
+          char_array_idx=(u8)(char_array_idx+char_array_idx_delta);
           k=k+k_delta;
         }
         chunk_count-=column_count;
@@ -107,7 +107,7 @@ debug_string_print_custom(char *context_string_base,u32 chunk_count,u8 *string_b
         if(compilable&&(i!=(row_count-1))){
           char_array_base[char_array_idx]=' ';
           char_array_base[char_array_idx+1]='\\';
-          char_array_idx+=2;
+          char_array_idx=(u8)(char_array_idx+2);
         }
         char_array_base[char_array_idx]='\n';
         char_array_base[char_array_idx+1]=0;

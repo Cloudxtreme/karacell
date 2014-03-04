@@ -69,11 +69,11 @@ Out:
     if(u8_count&U16_SIZE){
       u32_item_new=((u32)(u8_list_base[u8_idx+1])<<U8_BITS)+u8_list_base[u8_idx];
       u8_idx+=U16_SIZE;
-      shift+=U16_BITS;
+      shift=(u8)(shift+U16_BITS);
     }
     if(u8_count&U8_SIZE){
       u32_item_new+=(u32)(u8_list_base[u8_idx])<<shift;
-      shift+=U8_BITS;
+      shift=(u8)(shift+U8_BITS);
     }
     u32_item>>=shift;
     u32_item<<=shift;

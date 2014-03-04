@@ -190,49 +190,49 @@ Out:
     x0=iterand0;
     x=(u32)(product);
     carry0=(iterand8<x);
-    carry0+=product>>U32_BITS;
+    carry0+=(u32)(product>>U32_BITS);
     iterand0=iterand8-x;
     product=(iterand1*(u64)(d))+carry0;
     x1=iterand1;
     x=(u32)(product);
     carry0=(iterand9<x);
-    carry0+=product>>U32_BITS;
+    carry0+=(u32)(product>>U32_BITS);
     iterand1=iterand9-x;
     product=(iterand2*(u64)(d))+carry0;
     x2=iterand2;
     x=(u32)(product);
     carry0=(iterand10<x);
-    carry0+=product>>U32_BITS;
+    carry0+=(u32)(product>>U32_BITS);
     iterand2=iterand10-x;
     product=(iterand3*(u64)(d))+carry0;
     x3=iterand3;
     x=(u32)(product);
     carry0=(iterand11<x);
-    carry0+=product>>U32_BITS;
+    carry0+=(u32)(product>>U32_BITS);
     iterand3=iterand11-x;
     product=(iterand4*(u64)(d))+carry0;
     x4=iterand4;
     x=(u32)(product);
     carry0=(iterand12<x);
-    carry0+=product>>U32_BITS;
+    carry0+=(u32)(product>>U32_BITS);
     iterand4=iterand12-x;
     product=(iterand5*(u64)(d))+carry0;
     x5=iterand5;
     x=(u32)(product);
     carry0=(iterand13<x);
-    carry0+=product>>U32_BITS;
+    carry0+=(u32)(product>>U32_BITS);
     iterand5=iterand13-x;
     product=(iterand6*(u64)(d))+carry0;
     x6=iterand6;
     x=(u32)(product);
     carry0=(iterand14<x);
-    carry0+=product>>U32_BITS;
+    carry0+=(u32)(product>>U32_BITS);
     iterand6=iterand14-x;
     product=(iterand7*(u64)(d))+carry0;
     x7=iterand7;
     x=(u32)(product);
     carry0=(iterand15<x);
-    carry0+=product>>U32_BITS;
+    carry0+=(u32)(product>>U32_BITS);
     iterand7=iterand15-x;
     carry1=(x0<carry0);
     iterand8=x0-carry0;
@@ -471,7 +471,7 @@ Because the tumbler count is always even, we can pipeline up 2 at a time for bet
 */
     for(tumbler_idx=0;tumbler_idx<=tumbler_idx_max;){
       tumbler=tumbler_list_base[tumbler_idx];
-      tumbler+=tumbler_bias;
+      tumbler=(u16)(tumbler+tumbler_bias);
       table_idx=tumbler>>U64_BITS_LOG2;
       noise=karacell_table_base[table_idx];
 /*
@@ -490,7 +490,7 @@ We've computed the noise addition from the first tumbler. Add it to sum, then co
 */
       tumbler=tumbler_list_base[tumbler_idx];
       sum_prev=sum;
-      tumbler+=tumbler_bias;
+      tumbler=(u16)(tumbler+tumbler_bias);
       table_idx=tumbler>>U64_BITS_LOG2;
       sum+=noise;
       noise=karacell_table_base[table_idx];
@@ -507,14 +507,14 @@ We've computed the noise addition from the first tumbler. Add it to sum, then co
       sum+=noise;
       carry+=(sum<sum_prev);
     }
-    u32_list_base[u32_idx]^=sum;
-    u32_list_base[u32_idx+1]^=sum>>U32_BITS;
+    u32_list_base[u32_idx]=(u32)(u32_list_base[u32_idx]^sum);
+    u32_list_base[u32_idx+1]=(u32)(u32_list_base[u32_idx+1]^(sum>>U32_BITS));
     u32_idx+=2;
-    tumbler_bias+=U64_BITS;
+    tumbler_bias=(u16)(tumbler_bias+U64_BITS);
   }
   if(!(u32_count_minus_1&1)){
     for(tumbler_idx=0;tumbler_idx<=tumbler_idx_max;tumbler_idx++){
-      tumbler=tumbler_list_base[tumbler_idx]+tumbler_bias;
+      tumbler=(u16)(tumbler_list_base[tumbler_idx]+tumbler_bias);
       table_idx=tumbler>>U64_BITS_LOG2;
       noise=karacell_table_base[table_idx];
       shift_right=tumbler&U64_BIT_MAX;
@@ -524,7 +524,7 @@ We've computed the noise addition from the first tumbler. Add it to sum, then co
         noise>>=shift_right;
         noise+=karacell_table_base[table_idx]<<(U64_BITS-shift_right);
       }
-      carry+=noise;
+      carry+=(u32)(noise);
     }
     u32_list_base[u32_idx_max]^=carry;
   }
@@ -597,7 +597,7 @@ The hash seeds are just the crypt of 0, as computed with tumbler_bias==KARACELL_
       karacell_u32_list_zero(pad_u32_count_minus_1,u32_count,u32_list_base);
     }
     tail=u32_list_base[tail_u32_idx];
-    tail_mask=(1<<(tail_size<<U8_BITS_LOG2))-1;
+    tail_mask=(u32)((1<<(tail_size<<U8_BITS_LOG2))-1);
     tail&=tail_mask;
     u32_list_base[tail_u32_idx]=tail;
   }
@@ -849,12 +849,16 @@ Out:
   u32 *hash_xor_base;
   u8 mode;
   ULONG simulthread_idx;
-  spawn_t *spawn_base;
+  #ifdef PTHREAD
+    spawn_t *spawn_base;
+  #endif
   u32 thread_idx_max;
   karacell_thread_t *thread_list_base;
 
-  spawn_base=karacell_base->spawn_base;
-  SPAWN_RETIRE_ALL(spawn_base);
+  #ifdef PTHREAD
+    spawn_base=karacell_base->spawn_base;
+    SPAWN_RETIRE_ALL(spawn_base);
+  #endif
   mode=karacell_base->crypt_mode;
 /*
 All threads have been retired. If need be, xor all the (hash_xor)s of all the threads to hash_xor_all.
@@ -939,7 +943,7 @@ thread_count!=0 due to KARACELL_SIMULTHREAD_IDX_MAX<ULONG_MAX enforcement in twe
 /*
 Allocate contiguous chunks of blocks as fairly as possible using remainder distribution, such that low threads may receive an additional block each.
 */
-  block_remainder=block_count%thread_count;
+  block_remainder=(u32)(block_count%thread_count);
   block_count/=thread_count;
   block_idx=block_count*simulthread_idx;
   if(simulthread_idx<block_remainder){
@@ -948,6 +952,8 @@ Allocate contiguous chunks of blocks as fairly as possible using remainder distr
   }else{
     block_idx+=block_remainder;
   }
+  u32_list_base=NULL;
+  u32_idx=0;
   if(mode!=KARACELL_MODE_PREFAB){
     u32_list_base=karacell_base->crypt_u32_list_base;
     u32_idx=karacell_base->crypt_u32_idx_min+(block_idx<<KARACELL_BLOCK_U32_COUNT_LOG2);
@@ -963,10 +969,12 @@ Allocate contiguous chunks of blocks as fairly as possible using remainder distr
   hash_seed_u32_count=karacell_base->hash_seed_u32_count;
   hash_seed_u32_count_minus_1=hash_seed_u32_count-1;
   hash_type=karacell_base->hash_type_unencrypted;
+  hash_u32_count_minus_1=0;
   if(KARACELL_HASH_TYPE_NONE<hash_type){
     hash_u32_count_minus_1=karacell_base->hash_u32_count_minus_1_unencrypted;
     karacell_u32_list_zero(hash_u32_count_minus_1,0,hash_xor_base);
   }
+  block_base=NULL;
   while(block_count--){
     if((mode!=KARACELL_MODE_DECRYPT_SLOW)&&(mode!=KARACELL_MODE_ENCRYPT_SLOW)){
       block_base=block_base_list_base[block_idx];
@@ -1314,7 +1322,7 @@ This is the one case where 0 means 0 (no hash).
       hash_size=((u32)(hash_u32_count_minus_1)+1)<<U32_SIZE_LOG2;
     }
     *hash_size_base=hash_size;
-    hash_plus_header_size=hash_size+sizeof(karacell_header_t);
+    hash_plus_header_size=(u32)(hash_size+sizeof(karacell_header_t));
     file_size=payload_size+hash_plus_header_size;
     if(payload_size<file_size){
       karacell_base->hash_seed_u32_count=hash_seed_u32_count;
@@ -1450,12 +1458,12 @@ Out:
 You can expand this switch statement to deal with future hash types. If the hash type is unrecognized (which could legitimately happen if BUILD_NUMBER<build_number_of_creator), it's equivalent to having no hash, i.e. don't prevent decryption, but warn the user that there is no authentication available.
 */
     *hash_size_base=hash_size;
+    hash_seed_u32_count=0;
     switch(hash_type){
     case KARACELL_HASH_TYPE_UNKNOWN:
-      hash_u32_count_minus_1_expected=hash_u32_count_minus_1+1;
+      hash_u32_count_minus_1_expected=(u8)(hash_u32_count_minus_1+1);
       break;
     case KARACELL_HASH_TYPE_NONE:
-      hash_seed_u32_count=0;
       hash_u32_count_minus_1_expected=0;
       break;
     case KARACELL_HASH_TYPE_LMD8:
@@ -1683,7 +1691,7 @@ Deterministically corrupt newly allocated memory in order to flush out bugs. If 
 */
       corruption=0;
       do{
-        corruption+=0xA3;
+        corruption=(u8)(corruption+0xA3);
         ((u8 *)(base))[size_minus_1]=corruption;
       }while(size_minus_1--);
     }
@@ -1749,7 +1757,7 @@ Out:
 }
 
 ULONG
-karacell_list_size_get(ULONG idx_max,u32 item_size_minus_1){
+karacell_list_size_get(u64 idx_max,u32 item_size_minus_1){
 /*
 Compute the size of a list while checking for overflow. The idea is to abstract the whole problem of 32-bit vs. 64-bit allocation limits.
 
@@ -1757,19 +1765,19 @@ In:
 
   idx_max is the maximum index of the list. All values are allowed.
 
-  item_size_minus_1 is 1 less than the size of an item in the list, on [0,U32_MAX-1].
+  item_size_minus_1 is 1 less than the size of an item in the list. All values are allowed.
 
 Out:
 
   Returns 0 if the list size is not representable in a ULONG, else ((idx_max+1)*(item_size_minus_1+1)).
 */
-  ULONG idx_count;
+  u64 idx_count;
   u32 item_size;
   ULONG list_size;
 
-  item_size=item_size_minus_1+1;
   idx_count=idx_max+1;
-  list_size=idx_count*item_size;
+  item_size=item_size_minus_1+1;
+  list_size=(ULONG)(idx_count*item_size);
   if(list_size){
     if((list_size/item_size)!=idx_count){
       list_size=0;
@@ -1860,8 +1868,8 @@ We're out of memory. Perhaps some tiny further allocation is possible, but it's 
     block_base_list_base_new=block_base_list_base_old;
   }
   karacell_base->block_base_list_base=block_base_list_base_new;
-  karacell_base->block_idx_max=block_idx_max_new;
-  return block_idx_max_new;
+  karacell_base->block_idx_max=(ULONG)(block_idx_max_new);
+  return (ULONG)(block_idx_max_new);
 }
 
 karacell_t *
@@ -2014,7 +2022,7 @@ Allocate enough space for a block followed by a hash seed.
       status=!block_base;
       block_base_list_base[0]=block_base;
       header_base=(karacell_header_t *)(karacell_malloc(sizeof(karacell_header_t)-1));
-      status|=!header_base;
+      status=(u8)(status|(!header_base));
       karacell_base->header_base=header_base;
       karacell_base->block_idx_max=0;
 /*
@@ -2023,10 +2031,10 @@ Leave crypt_block_count_minus_1, crypt_block_idx_min, crypt_u32_idx_min, and cry
 Leave master_key undefined, which must be set by karacell_master_key_set().
 */
       thread_list_base=karacell_thread_list_make();
-      status|=!thread_list_base;
+      status=(u8)(status|(!thread_list_base));
       karacell_base->thread_list_base=thread_list_base;
       spawn_base=SPAWN_INIT(&karacell_thread_execute,(u8 *)(karacell_base),KARACELL_SIMULTHREAD_IDX_MAX);
-      status|=!spawn_base;
+      status=(u8)(status|(!spawn_base));
       karacell_base->spawn_base=spawn_base;
       if(!status){
         karacell_rewind(karacell_base);

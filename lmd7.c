@@ -1,8 +1,8 @@
 /*
 Leidich Message Digest
 http://leidich-message-digest.blogspot.com
-Copyright 2013 Russell Leidich
-October 7, 2013
+Copyright 2013-2014 Russell Leidich
+March 2, 2014
 
 This file is part of the Leidich Message Digest Library.
 
@@ -76,7 +76,7 @@ Out:
     x=(u32)(product);
     for(j=1;j<=((LMD7_U32_COUNT>>1)-1);j++){
       carry0=(c<x);
-      carry0+=product>>U32_BITS;
+      carry0+=(u32)(product>>U32_BITS);
       x_base[j]=p_base[j];
       p_base[j]=c-x;
       c=p_base[j+(LMD7_U32_COUNT>>1)+1];
@@ -84,7 +84,7 @@ Out:
       x=(u32)(product);
     }
     carry0=(x0<x);
-    carry0+=product>>U32_BITS;
+    carry0+=(u32)(product>>U32_BITS);
     p_base[LMD7_U32_COUNT>>1]=x0-x;
     for(j=1;j<=((LMD7_U32_COUNT>>1)-3);j+=2){
       carry1=(x_base[j]<carry0);
@@ -106,7 +106,7 @@ Out:
     x=(u32)(product);
     for(j=1;j<=((LMD7_U32_COUNT>>1)-2);j++){
       carry0=(c<x);
-      carry0+=product>>U32_BITS;
+      carry0+=(u32)(product>>U32_BITS);
       x_base[j]=p_base[j+LMD7_U32_COUNT];
       p_base[j+LMD7_U32_COUNT]=c-x;
       c=p_base[j+LMD7_U32_COUNT+(LMD7_U32_COUNT>>1)+1];
@@ -114,13 +114,13 @@ Out:
       x=(u32)(product);
     }
     carry0=(c<x);
-    carry0+=product>>U32_BITS;
+    carry0+=(u32)(product>>U32_BITS);
     x_base[(LMD7_U32_COUNT>>1)-1]=p_base[LMD7_U32_COUNT+(LMD7_U32_COUNT>>1)-1];
     p_base[LMD7_U32_COUNT+(LMD7_U32_COUNT>>1)-1]=c-x;
     product=(x_base[(LMD7_U32_COUNT>>1)-1]*(u64)(d))+carry0;
     x=(u32)(product);
     carry0=(x0<x);
-    carry0+=product>>U32_BITS;
+    carry0+=(u32)(product>>U32_BITS);
     p_base[LMD7_U32_COUNT+(LMD7_U32_COUNT>>1)]=x0-x;
     for(j=1;j<=((LMD7_U32_COUNT>>1)-3);j+=2){
       carry1=(x_base[j]<carry0);

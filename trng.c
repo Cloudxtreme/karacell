@@ -25,10 +25,16 @@ True Random Number Generator
 
 This is the interface to the true random number generator required but not specified by Karacell. See true_random_get() for important security information.
 */
-#ifdef _32_
-  extern u32 jytter_true_random_get(jytter_scratch_space_t *jytter_scratch_space_base) __attribute__((fastcall));
+#ifdef JYTTER
+  #ifdef _32_
+    extern u32 jytter_true_random_get(jytter_scratch_space_t *jytter_scratch_space_base) __attribute__((fastcall));
+  #else
+    extern u32 jytter_true_random_get(jytter_scratch_space_t *jytter_scratch_space_base);
+  #endif
+#elif defined(SECRANDOM)
+  #include <Security/SecRandom.h>
 #else
-  extern u32 jytter_true_random_get(jytter_scratch_space_t *jytter_scratch_space_base);
+  #error "No true random number generator defined!"
 #endif
 
 u32
@@ -42,7 +48,21 @@ Out:
 
   Returns u32 sourced from unbiased (we hope!) physical noise.
 */
-  jytter_scratch_space_t jytter_scratch_space;
+  u32 random;
 
-  return jytter_true_random_get(&jytter_scratch_space);
+  #ifdef JYTTER
+    jytter_scratch_space_t jytter_scratch_space;
+
+    random=jytter_true_random_get(&jytter_scratch_space);
+  #else
+    int status;
+
+    do{
+      status=(u32)(SecRandomCopyBytes(kSecRandomDefault,U32_SIZE,(u8 *)(&random));
+/*
+The above call should never fail. If it does, we're either waiting for entropy to accrue, which is fine, or the platform is no longer fit to perform secure transactions, in which case we might as well hang and insprie the user to submit a bug report.
+*/
+    }while(status);
+  #endif
+  return random;
 }

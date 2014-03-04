@@ -1,8 +1,8 @@
 /*
 Leidich Message Digest
 http://leidich-message-digest.blogspot.com
-Copyright 2013 Russell Leidich
-September 17, 2013
+Copyright 2013-2014 Russell Leidich
+March 2, 2014
 
 This file is part of the Leidich Message Digest Library.
 
@@ -37,7 +37,7 @@ Don't do this if you just want to generate pseudorandom numbers.
 #define LMD_FINALIZE(a_const_u32,c_u32,x_u32,iterand_u64,lmd_u64) \
   lmd_u64+=iterand_u64; \
   x_u32=(u32)(lmd_u64); \
-  c_u32=lmd_u64>>U32_BITS; \
+  c_u32=(u32)(lmd_u64>>U32_BITS); \
   LMD_ITERATE_NO_ZERO_CHECK(a_const_u32,c_u32,x_u32,iterand_u64) \
   LMD_ITERATE_NO_ZERO_CHECK(a_const_u32,c_u32,x_u32,iterand_u64) \
   LMD_ITERATE_NO_ZERO_CHECK(a_const_u32,c_u32,x_u32,iterand_u64) \
@@ -54,7 +54,7 @@ Produces pseudorandom x_u32 on [0,U32_MAX].
 #define LMD_ITERATE_NO_ZERO_CHECK(a_const_u32,c_u32,x_u32,iterand_u64) \
   iterand_u64=((u64)(a_const_u32)*x_u32)+c_u32; \
   x_u32=(u32)(iterand_u64); \
-  c_u32=iterand_u64>>U32_BITS;
+  c_u32=(u32)(iterand_u64>>U32_BITS);
 
 /*
 Produces pseudorandom x_u32 on [1,U32_MAX].

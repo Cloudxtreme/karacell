@@ -42,150 +42,140 @@ The Karacell source code supplied herein isn't really intended to be a command l
 
 COMPILING
 
-MacOS hasn't really been tested, so let us know if you find a problem.
+Compiling with MinGW will give a warning about jytter_true_random_get, which can be safely ignored.
 
-Run one of the build* files (see below). The output, karacell and demo executables, are to the temp subfolder of the local path. You can then run demo(.exe) to make sure things seem to be functioning properly, or karacell(.exe) for syntax info.
+make clean
+
+  Deletes preexisting build files.
+
+make demo
+
+  Produces %TEMP%\demo.exe on Windows or ./temp/demo otherwise. Run it to test the correct behavior of Karacell.
+
+make karacell
+make karacell_debug
+make karacell_debug_pipeline
+make karacell_debug_pipeline_pthread
+make karacell_debug_pthread
+make karacell_pipeline
+make karacell_pipeline_pthread
+make karacell_pthread
+
+  Produces a monothreaded or multithreaded ("pthread") commandline version of IO pipelined-or-not ("pipeline") Karacell with or without the debugger ("debug") enabled. IO pipelining is for demo purposes only, and does not result in a performance improvement in this case.
 
 FILE SUMMARY
 
 [ascii.c]
 
-ASCII conversion function for key importation from the command line.
-
-[build_a_clean.sh]
-[build_b_clean.bat]
-
-Cleaning files which delete everything in temp. Be careful to run them from within the karacell folder, and not from somewhere else!
- 
-[build_c_linux32.sh]
-[build_d_linux64.sh]
-[build_e_mac_os32.sh]
-[build_f_mac_os64.sh]
-[build_g_win32.bat]
-
-Build files for various OSes, named such that minimal command line tabbing is required. If building with MinGW under Windows, you'll see some innocuous warnings related to the .asm files. If you can't seem to run them in Linux, then either use chmod to add the executable attribute, or run via "/bin/sh [filename]".
-
-Build flags:
-
--DDEBUG(_OFF)
-
-Toggles the debugger. Enabling the debugger will enable corrupt-on-allocate with malloc() in order to reveal dependencies on uninitialized memory.
-
--DPIPELINE(_OFF)
-
-Toggles IO pipelining. The idea is to allow disk (or network) IO in parallel with xor mask fabrication, ahead of plaintext or ciphertext arrival. As coded, it offers no performance advantages, but reworking the code for a specific situation could result in substantial acceleration.
-
--DPTHREAD(_OFF)
-
-Toggles multithreading support. Multithreading provides performance advantages, but may not be acceptable under some security regimes.
+  ASCII conversion function for key importation from the command line.
 
 [constant.h]
 
-Boring constants.
+  Boring constants.
 
 [COPYING]
 
-Required for distribution.
+  Required for distribution.
 
 [debug.c]
 [debug.h]
 
-Debug infrastructure (compile with -DDEBUG).
+  Debug infrastructure (compile with -DDEBUG).
 
 [demo.c]
 
-Demo encryption xor mask construction. When you run temp/demo, you should get a pile of text ending in "Yay! It's correct." This is followed by tests of the list (string) cryption apparatus, which performs Karacell operations on memory regions as opposed to files. These tests are well commented so as to illustrate the use of said list cryption functions.
+  Demo encryption xor mask construction. When you run temp/demo, you should get a pile of text ending in "Yay! It's correct." This is followed by tests of the list (string) cryption apparatus, which performs Karacell operations on memory regions as opposed to files. These tests are well commented so as to illustrate the use of said list cryption functions.
 
 [entropy.c]
 
-Demo of entropy factory for the purpose of generating initial values for Karacell. NOT part of the Karacell spec.
+  Demo of entropy factory for the purpose of generating initial values for Karacell. NOT part of the Karacell spec.
 
 [file_sys.c]
 [file_sys.h]
 
-Boring file IO stuff.
+  Boring file IO stuff.
 
 [flag.h]
 
-Build control.
+  Build control.
 
 [jytter.asm]
 [jytter.h]
 
-True random number generator for X86 and X64. http://jytter.blogspot.com
+  True random number generator for X86 and X64. http://jytter.blogspot.com
 
 [karacell.c]
 [karacell.h]
 
-Karacell 3 core functions and data structures. We don't provide a fully encapsulated encrypt_file() function because Karacell needs to be divorced from TRNG architecture, the latter being hardware dependent. There are other design considerations as well, namely: (1) multithreading (handled transparently via the PTHREAD(_OFF) build constants) and (2) the decision to construct xor masks (a) immediately (JIT) after data arrives (higher latency requiring only a local secret entropy pool) or (b) speculatively (see PIPELINE(_OFF) in flag.h, which is used only for demo purposes but should operate correctly) prior to arrival (lower latency, but requiring an entropy pool shared with all peers and resynchonized after each power failure in such a manner as to prevent replay attacks). Most architectures will probably perform best with monothreading (which keeps other cores available for more urgent tasks) and JIT mask construction.
+  Karacell 3 core functions and data structures. We don't provide a fully encapsulated encrypt_file() function because Karacell needs to be divorced from TRNG architecture, the latter being hardware dependent. There are other design considerations as well, namely: (1) multithreading (handled transparently via the PTHREAD(_OFF) build constants) and (2) the decision to construct xor masks (a) immediately (JIT) after data arrives (higher latency requiring only a local secret entropy pool) or (b) speculatively (see PIPELINE(_OFF) in flag.h, which is used only for demo purposes but should operate correctly) prior to arrival (lower latency, but requiring an entropy pool shared with all peers and resynchonized after each power failure in such a manner as to prevent replay attacks). Most architectures will probably perform best with monothreading (which keeps other cores available for more urgent tasks) and JIT mask construction.
 
-However, a simplified JIT cryption interface is provided in u8.c, u16.c, and u32.c.
+  However, a simplified JIT cryption interface is provided in u8.c, u16.c, and u32.c.
 
 [listcrypt.c]
 
-Functions used by u8.c, u16.c, and u32.c.
+  Functions used by u8.c, u16.c, and u32.c.
 
 [lmd2.c]
 [lmd2.h]
 
-Error detection library used to find accidental flaws in critical data structures.
+  Error detection library used to find accidental flaws in critical data structures.
 
 [lmd7.c]
 [lmd7.h]
 [lmd8.c]
 [lmd8.h]
 
-Secure hash libraries. http://leidich-message-digest.blogspot.com
+  Secure hash libraries. http://leidich-message-digest.blogspot.com
 
 [main.c]
 
-OS interface which connects karacell.c to the command line. It knows only the minimum possible amount of information about Karacell file construction in order to do so. The name only refers to its status as the root compilation file for the executable, and is not required if calling the listcrypt functions via u8.c, u16.c, or u32.c.
+  OS interface which connects karacell.c to the command line. It knows only the minimum possible amount of information about Karacell file construction in order to do so. The name only refers to its status as the root compilation file for the executable, and is not required if calling the listcrypt functions via u8.c, u16.c, or u32.c.
+
+[makefile]
+
+  Disasterously complex multiplatform build file. Be careful! Tabs and spaces actually matter.
 
 [mathematica.txt]
 
-Cut-and-pastable Wolfram Mathematica Kernel source code which emulates demo.c using huge integers. Hopefully this will make our algo more accessible to mathematically minded hackers. Karacell only looks complicated because we're forced to use machine-sized integers and deal with annoying OS issues and exogenous hashes. It's mainly just a Marsaglia oscillator which selects rotations of an integer to add together, in order to form xor masks. So relax, already!
+  Cut-and-pastable Wolfram Mathematica Kernel source code which emulates demo.c using huge integers. Hopefully this will make our algo more accessible to mathematically minded hackers. Karacell only looks complicated because we're forced to use machine-sized integers and deal with annoying OS issues and exogenous hashes. It's mainly just a Marsaglia oscillator which selects rotations of an integer to add together, in order to form xor masks. So relax, already!
 
 [print.c]
 
-Stupid text printing functions.
+  Stupid text printing functions.
 
 [spawn.c]
 [spawn.h]
 
-Multithreading library. http://spawnthread.blogspot.com
+  Multithreading library. http://spawnthread.blogspot.com
 
 [table.h]
 
-The Karacell Table.
+  The Karacell Table.
 
 [temp]
 
-Folder for emitted build files and executables.
-
-[timestamp.asm]
-
-X86 and X64 CPU timestamp reader.
+  Folder for emitted build files and executables.
 
 [trng.c]
 
-Abstract interface from entropy.c to your true random number generator of choice.
+  Abstract interface from entropy.c to your true random number generator of choice.
 
 [tweak.h]
 
-Performance tweaks.
+  Performance tweaks.
 
 [u8.c]
 
-Functions for cryption of byte-granular lists (strings).
+  Functions for cryption of byte-granular lists (strings).
 
 [u16.c]
 
-Functions for cryption of u16-granular lists, for example, UNICODE.
+  Functions for cryption of u16-granular lists, for example, UNICODE.
 
 [u32.c]
 
-Functions for cryption of u32-granular lists.
+  Functions for cryption of u32-granular lists.
 
 [unix_include.h]
 
-Standard UNIXy stuff.
+  Standard UNIXy stuff.

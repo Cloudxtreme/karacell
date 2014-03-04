@@ -72,7 +72,7 @@ Load the digit and, if it's a letter, convert it to lower case.
         status=1;
       }
       master_key_u32|=digit<<digit_shift;
-      digit_shift+=4;
+      digit_shift=(u8)(digit_shift+4);
       digit_shift&=U32_BIT_MAX;
       if(!(digit_shift&&u8_idx)){
         master_key_base[master_key_idx]=master_key_u32;
