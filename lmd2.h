@@ -2,7 +2,7 @@
 Leidich Message Digest
 http://leidich-message-digest.blogspot.com
 Copyright 2013-2014 Russell Leidich
-March 2, 2014
+March 10, 2014
 
 This file is part of the Leidich Message Digest Library.
 
@@ -82,6 +82,8 @@ The number of nonzero DWORDs before (x == 0) appears is 11,460,787,448, excludin
 
 If you're more concerned about generating long lists of nonzero X values, so you can then use LMD_ITERATE_NO_ZERO_CHECK for "small" files for speed, then use LMD3 instead.
 */
+#define LMD_STRING_LMD2_GET(string_base,string_idx_min,string_size) (lmd_string_lmd2_custom_get(LMD2_C0,LMD2_X0,string_base,string_idx_min,string_size))
+#define LMD_STRING_LMD3_GET(string_base,string_idx_min,string_size) (lmd_string_lmd2_custom_get(LMD3_C0,LMD3_X0,string_base,string_idx_min,string_size))
 #define LMD2_A 0xFE001000UL
 #define LMD2_C0 0xC97A34B3UL
 #define LMD2_X0 0x129E5CFAUL

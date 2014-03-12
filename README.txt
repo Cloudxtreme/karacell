@@ -42,15 +42,15 @@ The Karacell source code supplied herein isn't really intended to be a command l
 
 COMPILING
 
-Compiling with MinGW will give a warning about jytter_true_random_get, which can be safely ignored.
+Compiling with MinGW will give warnings about stdcall-fixup, jytter_true_random_get, -fpic, and flags.h, all of which can be safely ignored.
 
 make clean
 
-  Deletes preexisting build files.
+  Deletes preexisting build files in the temp subfolder.
 
 make demo
 
-  Produces %TEMP%\demo.exe on Windows or ./temp/demo otherwise. Run it to test the correct behavior of Karacell.
+  Produces temp\demo.exe on Windows or ./temp/demo otherwise. Run it to test the correct behavior of Karacell.
 
 make karacell
 make karacell_debug
@@ -61,7 +61,12 @@ make karacell_pipeline
 make karacell_pipeline_pthread
 make karacell_pthread
 
-  Produces a monothreaded or multithreaded ("pthread") commandline version of IO pipelined-or-not ("pipeline") Karacell with or without the debugger ("debug") enabled. IO pipelining is for demo purposes only, and does not result in a performance improvement in this case.
+  Produces a monothreaded or multithreaded ("pthread", unavailable in Windows) commandline version of IO pipelined-or-not ("pipeline") Karacell in the temp subfolder with or without the debugger ("debug") enabled. IO pipelining is for demo purposes only, and does not result in a performance improvement in this case.
+
+make karacell_lib
+make karacell_lib_pthread
+
+  Produces a monothreaded or multithreaded ("pthread", unavailable in Windows) shared library in the temp subfolder for future dynamic linking purposes. This library is big and disgusting because it contains not only Karacell, but also services for thread management (if enabled), entropy generation, list (string) encryption, and hash computation. Sorry, but monolithic design was the only choice that worked in practice, due to issues with MinGW. If you want finer granularity of code inclusion, then consider including the required C and H files directly, in the same manner as main.c, or linking directly to the object files produced during this compilation.
 
 FILE SUMMARY
 
@@ -90,6 +95,14 @@ FILE SUMMARY
 
   Demo of entropy factory for the purpose of generating initial values for Karacell. NOT part of the Karacell spec.
 
+[entropy_lib.c]
+
+  Main file for making libentropy.so.
+
+[entropy_xtrn.h]
+
+  C (extern)s for use with libentropy.so.
+
 [file_sys.c]
 [file_sys.h]
 
@@ -109,11 +122,27 @@ FILE SUMMARY
 
   Karacell 3 core functions and data structures. We don't provide a fully encapsulated encrypt_file() function because Karacell needs to be divorced from TRNG architecture, the latter being hardware dependent. There are other design considerations as well, namely: (1) multithreading (handled transparently via the PTHREAD(_OFF) build constants) and (2) the decision to construct xor masks (a) immediately (JIT) after data arrives (higher latency requiring only a local secret entropy pool) or (b) speculatively (see PIPELINE(_OFF) in flag.h, which is used only for demo purposes but should operate correctly) prior to arrival (lower latency, but requiring an entropy pool shared with all peers and resynchonized after each power failure in such a manner as to prevent replay attacks). Most architectures will probably perform best with monothreading (which keeps other cores available for more urgent tasks) and JIT mask construction.
 
-  However, a simplified JIT cryption interface is provided in u8.c, u16.c, and u32.c.
+  However, a simplified JIT cryption interface is provided in u8crypt.c, u16crypt.c, and u32crypt.c.
+
+[karacell_lib.c]
+
+  Main file for making libkaracell.so.
+
+[karacell_xtrn.h]
+
+  C (extern)s for use with libkaracell.so.
 
 [listcrypt.c]
 
-  Functions used by u8.c, u16.c, and u32.c.
+  Functions used by u8crypt.c, u16crypt.c, and u32crypt.c.
+
+[listcrypt_lib.c]
+
+  Main file for making liblistcrypt.so.
+
+[listcrypt_xtrn.h]
+
+  C (extern)s for use with liblistcrypt.so.
 
 [lmd2.c]
 [lmd2.h]
@@ -129,7 +158,7 @@ FILE SUMMARY
 
 [main.c]
 
-  OS interface which connects karacell.c to the command line. It knows only the minimum possible amount of information about Karacell file construction in order to do so. The name only refers to its status as the root compilation file for the executable, and is not required if calling the listcrypt functions via u8.c, u16.c, or u32.c.
+  OS interface which connects karacell.c to the command line. It knows only the minimum possible amount of information about Karacell file construction in order to do so. The name only refers to its status as the root compilation file for the executable, and is not required if calling the listcrypt functions via u8crypt.c, u16crypt.c, or u32crypt.c.
 
 [makefile]
 
@@ -148,6 +177,14 @@ FILE SUMMARY
 
   Multithreading library. http://spawnthread.blogspot.com
 
+[spawn_lib.c]
+
+  Main file for making libspawn.so.
+
+[spawn_xtrn.h]
+
+  C (extern)s for use with libspawn.so.
+
 [table.h]
 
   The Karacell Table.
@@ -164,15 +201,15 @@ FILE SUMMARY
 
   Performance tweaks.
 
-[u8.c]
+[u8crypt.c]
 
   Functions for cryption of byte-granular lists (strings).
 
-[u16.c]
+[u16crypt.c]
 
   Functions for cryption of u16-granular lists, for example, UNICODE.
 
-[u32.c]
+[u32crypt.c]
 
   Functions for cryption of u32-granular lists.
 

@@ -54,7 +54,7 @@ Out:
     jytter_scratch_space_t jytter_scratch_space;
 
     random=jytter_true_random_get(&jytter_scratch_space);
-  #else
+  #elif defined(SECRANDOM)
     int status;
 
     do{

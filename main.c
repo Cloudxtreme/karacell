@@ -26,17 +26,21 @@ Operating System Interface for Karacell
 The functions in this file are for demonstration purposes, and are not part of the Karacell specification.
 */
 #include "flag.h"
+#include "pipeline.h"
 #include "unix_include.h"
 #include "constant.h"
 #include "lmd2.h"
 #include "lmd7.h"
 #include "lmd8.h"
+#include "simulthread.h"
 #include "tweak.h"
 #include "debug.h"
 #include "spawn.h"
 #include "file_sys.h"
 #include "table.h"
-#include "jytter.h"
+#ifdef JYTTER
+  #include "jytter.h"
+#endif
 #include "karacell.h"
 #include "lmd2.c"
 #include "lmd7.c"

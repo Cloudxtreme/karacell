@@ -1,8 +1,8 @@
 /*
 Leidich Message Digest
 http://leidich-message-digest.blogspot.com
-Copyright 2013 Russell Leidich
-February 15, 2013
+Copyright 2013-2014 Russell Leidich
+March 10, 2014
 
 This file is part of the Leidich Message Digest Library.
 
@@ -22,9 +22,6 @@ If not, see http://www.gnu.org/licenses/ .
 /*
 Use the following macros to compute the LMD2 or LMD3 of a string.
 */
-#define LMD_STRING_LMD2_GET(string_base,string_idx_min,string_size) (lmd_string_lmd2_custom_get(LMD2_C0,LMD2_X0,string_base,string_idx_min,string_size))
-#define LMD_STRING_LMD3_GET(string_base,string_idx_min,string_size) (lmd_string_lmd2_custom_get(LMD3_C0,LMD3_X0,string_base,string_idx_min,string_size))
-
 u64
 lmd_string_lmd2_custom_get(u32 lmd_c0,u32 lmd_x0,u8 *string_base,ULONG string_idx_min,u32 string_size){
 /*

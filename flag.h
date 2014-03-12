@@ -23,7 +23,7 @@ License version 3 along with the Karacell 3 Library (filename
 /*
 Build control. If possible, change the build using gcc command switches, and not by changing this file.
 */
-#define BUILD_NUMBER 168
+#define BUILD_NUMBER 173
 #define BUILD_NUMBER_NEEDED_TO_DECODE 131
 #if !(defined(_32_)||defined(_64_))
   #error "Use 'gcc -D_64_' for 64-bit or 'gcc -D_32_' for 32-bit code."
@@ -34,11 +34,6 @@ Build control. If possible, change the build using gcc command switches, and not
   #error "Use 'gcc -DDEBUG' for debugging or 'gcc -DDEBUG_OFF' for release."
 #elif defined(DEBUG)&&defined(DEBUG_OFF)
   #error "You have defined both DEBUG and DEBUG_OFF. Chose one only."
-#endif
-#if !(defined(PIPELINE)||defined(PIPELINE_OFF))
-  #error "Use 'gcc -DPIPELINE' to enable IO pipelining or 'gcc -DPIPELINE_OFF' not to."
-#elif defined(PIPELINE)&&defined(PIPELINE_OFF)
-  #error "You have defined both PIPELINE and PIPELINE_OFF. Chose one only."
 #endif
 #if !(defined(PTHREAD)||defined(PTHREAD_OFF))
   #error "Use 'gcc -DPTHREAD' for multithreading or 'gcc -DPTHREAD_OFF' for monothreading."
