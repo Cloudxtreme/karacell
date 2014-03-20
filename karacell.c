@@ -2018,7 +2018,7 @@ Out:
 /*
 Allocate enough space for a block followed by a hash seed.
 */
-      block_base=(u32 *)(karacell_malloc(KARACELL_BLOCK_SIZE+KARACELL_HASH_SIZE_MAX-1));
+      block_base=(u32 *)(karacell_malloc(KARACELL_BLOCK_SIZE+KARACELL_HASH_SEED_SIZE_MAX-1));
       status=!block_base;
       block_base_list_base[0]=block_base;
       header_base=(karacell_header_t *)(karacell_malloc(sizeof(karacell_header_t)-1));
