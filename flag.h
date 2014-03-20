@@ -23,7 +23,7 @@ License version 3 along with the Karacell 3 Library (filename
 /*
 Build control. If possible, change the build using gcc command switches, and not by changing this file.
 */
-#define BUILD_NUMBER 173
+#define BUILD_NUMBER 176
 #define BUILD_NUMBER_NEEDED_TO_DECODE 131
 #if !(defined(_32_)||defined(_64_))
   #error "Use 'gcc -D_64_' for 64-bit or 'gcc -D_32_' for 32-bit code."

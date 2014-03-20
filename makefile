@@ -52,59 +52,61 @@ clean:
 
 demo:
 	$(NASM)
-	cc -c -fpic -D_$(BITS)_ -DDEBUG_OFF -DPTHREAD_OFF -D$(TRUERANDOM) $(WARNFLAGS) $(BASICFLAGS) $(MEMFLAGS) -otemp$(SLASH)entropy$(OBJ) entropy_lib.c
-	cc -c -fpic -D_$(BITS)_ -DDEBUG_OFF -DPTHREAD_OFF $(WARNFLAGS) $(BASICFLAGS) $(MEMFLAGS) -otemp$(SLASH)karacell$(OBJ) karacell_lib.c
-	cc -c -fpic -D_$(BITS)_ -DDEBUG_OFF -DPTHREAD_OFF $(WARNFLAGS) $(BASICFLAGS) $(MEMFLAGS) -otemp$(SLASH)listcrypt$(OBJ) listcrypt_lib.c
-	cc -c -fpic -D_$(BITS)_ -DDEBUG_OFF -DPTHREAD_OFF $(WARNFLAGS) $(BASICFLAGS) $(MEMFLAGS) -otemp$(SLASH)lmd$(OBJ) lmd_lib.c
-	cc -c -fpic -D_$(BITS)_ -DDEBUG_OFF -DPTHREAD_OFF $(WARNFLAGS) $(BASICFLAGS) $(MEMFLAGS) -otemp$(SLASH)spawn$(OBJ) spawn_lib.c
-	cc -D_$(BITS)_ -DDEBUG -DPTHREAD_OFF $(WARNFLAGS) $(BASICFLAGS) $(MEMFLAGS) $(JYTTEROBJ) temp$(SLASH)entropy$(OBJ) temp$(SLASH)karacell$(OBJ) temp$(SLASH)listcrypt$(OBJ) temp$(SLASH)lmd$(OBJ) temp$(SLASH)spawn$(OBJ) -otemp$(SLASH)demo$(EXE) demo.c
+	cc -c -fpic -D_$(BITS)_ -DDEBUG -DPTHREAD_OFF $(WARNFLAGS) $(BASICFLAGS) $(MEMFLAGS) -otemp$(SLASH)debug$(OBJ) debug_obj.c
+	cc -c -fpic -D_$(BITS)_ -DDEBUG -DPTHREAD_OFF -D$(TRUERANDOM) $(WARNFLAGS) $(BASICFLAGS) $(MEMFLAGS) -otemp$(SLASH)entropy$(OBJ) entropy_obj.c
+	cc -c -fpic -D_$(BITS)_ -DDEBUG -DPTHREAD_OFF $(WARNFLAGS) $(BASICFLAGS) $(MEMFLAGS) -otemp$(SLASH)karacell$(OBJ) karacell_obj.c
+	cc -c -fpic -D_$(BITS)_ -DDEBUG -DPTHREAD_OFF $(WARNFLAGS) $(BASICFLAGS) $(MEMFLAGS) -otemp$(SLASH)listcrypt$(OBJ) listcrypt_obj.c
+	cc -c -fpic -D_$(BITS)_ -DDEBUG -DPTHREAD_OFF $(WARNFLAGS) $(BASICFLAGS) $(MEMFLAGS) -otemp$(SLASH)lmd$(OBJ) lmd_obj.c
+	cc -c -fpic -D_$(BITS)_ -DDEBUG -DPTHREAD_OFF $(WARNFLAGS) $(BASICFLAGS) $(MEMFLAGS) -otemp$(SLASH)print$(OBJ) print_obj.c
+	cc -c -fpic -D_$(BITS)_ -DDEBUG -DPTHREAD_OFF $(WARNFLAGS) $(BASICFLAGS) $(MEMFLAGS) -otemp$(SLASH)spawn$(OBJ) spawn_obj.c
+	cc -D_$(BITS)_ -DDEBUG -DPTHREAD_OFF $(WARNFLAGS) $(BASICFLAGS) $(MEMFLAGS) $(JYTTEROBJ) temp$(SLASH)debug$(OBJ) temp$(SLASH)entropy$(OBJ) temp$(SLASH)karacell$(OBJ) temp$(SLASH)listcrypt$(OBJ) temp$(SLASH)lmd$(OBJ) temp$(SLASH)print$(OBJ) temp$(SLASH)spawn$(OBJ) -otemp$(SLASH)demo$(EXE) demo.c
 
 karacell:
 	$(NASM)
-	cc -D_$(BITS)_ -DDEBUG_OFF -DPTHREAD_OFF -DPIPELINE_OFF -D$(TRUERANDOM) $(WARNFLAGS) $(BASICFLAGS) $(MEMFLAGS) $(JYTTEROBJ) -otemp$(SLASH)karacell$(EXE) main.c
+	cc -D_$(BITS)_ -DDEBUG_OFF -DPIPELINE_OFF -DPTHREAD_OFF -D$(TRUERANDOM) $(WARNFLAGS) $(BASICFLAGS) $(MEMFLAGS) $(JYTTEROBJ) -otemp$(SLASH)karacell$(EXE) main.c
 
 karacell_debug:
 	$(NASM)
-	cc -D_$(BITS)_ -DDEBUG -DPTHREAD_OFF -DPIPELINE_OFF -D$(TRUERANDOM) $(WARNFLAGS) $(BASICFLAGS) $(MEMFLAGS) $(JYTTEROBJ) -otemp$(SLASH)karacell$(EXE) main.c
+	cc -D_$(BITS)_ -DDEBUG -DPIPELINE_OFF -DPTHREAD_OFF -D$(TRUERANDOM) $(WARNFLAGS) $(BASICFLAGS) $(MEMFLAGS) $(JYTTEROBJ) -otemp$(SLASH)karacell$(EXE) main.c
 
 karacell_debug_pipeline:
 	$(NASM)
-	cc -D_$(BITS)_ -DDEBUG -DPTHREAD_OFF -DPIPELINE -D$(TRUERANDOM) $(WARNFLAGS) $(BASICFLAGS) $(MEMFLAGS) $(JYTTEROBJ) -otemp$(SLASH)karacell$(EXE) main.c
-
-karacell_debug_pthread:
-	$(NASM)
-	cc -D_$(BITS)_ -DDEBUG -DPTHREAD -DPIPELINE_OFF -D$(TRUERANDOM) $(WARNFLAGS) $(BASICFLAGS) -pthread $(MEMFLAGS) $(JYTTEROBJ) -otemp$(SLASH)karacell$(EXE) main.c
+	cc -D_$(BITS)_ -DDEBUG -DPIPELINE -DPTHREAD_OFF -D$(TRUERANDOM) $(WARNFLAGS) $(BASICFLAGS) $(MEMFLAGS) $(JYTTEROBJ) -otemp$(SLASH)karacell$(EXE) main.c
 
 karacell_debug_pipeline_pthread:
 	$(NASM)
-	cc -D_$(BITS)_ -DDEBUG -DPTHREAD -DPIPELINE -D$(TRUERANDOM) $(WARNFLAGS) $(BASICFLAGS) -pthread $(MEMFLAGS) $(JYTTEROBJ) -otemp$(SLASH)karacell$(EXE) main.c
+	cc -D_$(BITS)_ -DDEBUG -DPIPELINE -DPTHREAD -D$(TRUERANDOM) $(WARNFLAGS) $(BASICFLAGS) -pthread $(MEMFLAGS) $(JYTTEROBJ) -otemp$(SLASH)karacell$(EXE) main.c
+
+karacell_debug_pthread:
+	$(NASM)
+	cc -D_$(BITS)_ -DDEBUG -DPIPELINE_OFF -DPTHREAD -D$(TRUERANDOM) $(WARNFLAGS) $(BASICFLAGS) -pthread $(MEMFLAGS) $(JYTTEROBJ) -otemp$(SLASH)karacell$(EXE) main.c
 
 karacell_lib:
 	$(NASM)
-	cc -c -fpic -D_$(BITS)_ -DDEBUG_OFF -DPTHREAD_OFF -D$(TRUERANDOM) $(WARNFLAGS) $(BASICFLAGS) $(MEMFLAGS) -otemp$(SLASH)entropy$(OBJ) entropy_lib.c
-	cc -c -fpic -D_$(BITS)_ -DDEBUG_OFF -DPTHREAD_OFF $(WARNFLAGS) $(BASICFLAGS) $(MEMFLAGS) -otemp$(SLASH)karacell$(OBJ) karacell_lib.c
-	cc -c -fpic -D_$(BITS)_ -DDEBUG_OFF -DPTHREAD_OFF $(WARNFLAGS) $(BASICFLAGS) $(MEMFLAGS) -otemp$(SLASH)listcrypt$(OBJ) listcrypt_lib.c
-	cc -c -fpic -D_$(BITS)_ -DDEBUG_OFF -DPTHREAD_OFF $(WARNFLAGS) $(BASICFLAGS) $(MEMFLAGS) -otemp$(SLASH)lmd$(OBJ) lmd_lib.c
-	cc -c -fpic -D_$(BITS)_ -DDEBUG_OFF -DPTHREAD_OFF $(WARNFLAGS) $(BASICFLAGS) $(MEMFLAGS) -otemp$(SLASH)spawn$(OBJ) spawn_lib.c
+	cc -c -fpic -D_$(BITS)_ -DDEBUG_OFF -DPTHREAD_OFF -D$(TRUERANDOM) $(WARNFLAGS) $(BASICFLAGS) $(MEMFLAGS) -otemp$(SLASH)entropy$(OBJ) entropy_obj.c
+	cc -c -fpic -D_$(BITS)_ -DDEBUG_OFF -DPTHREAD_OFF $(WARNFLAGS) $(BASICFLAGS) $(MEMFLAGS) -otemp$(SLASH)karacell$(OBJ) karacell_obj.c
+	cc -c -fpic -D_$(BITS)_ -DDEBUG_OFF -DPTHREAD_OFF $(WARNFLAGS) $(BASICFLAGS) $(MEMFLAGS) -otemp$(SLASH)listcrypt$(OBJ) listcrypt_obj.c
+	cc -c -fpic -D_$(BITS)_ -DDEBUG_OFF -DPTHREAD_OFF $(WARNFLAGS) $(BASICFLAGS) $(MEMFLAGS) -otemp$(SLASH)lmd$(OBJ) lmd_obj.c
+	cc -c -fpic -D_$(BITS)_ -DDEBUG_OFF -DPTHREAD_OFF $(WARNFLAGS) $(BASICFLAGS) $(MEMFLAGS) -otemp$(SLASH)spawn$(OBJ) spawn_obj.c
 	cc -shared -otemp$(SLASH)libkaracell.so $(JYTTEROBJ) temp$(SLASH)entropy$(OBJ) temp$(SLASH)karacell$(OBJ) temp$(SLASH)listcrypt$(OBJ) temp$(SLASH)lmd$(OBJ) temp$(SLASH)spawn$(OBJ)
 
 karacell_lib_pthread:
 	$(NASM)
-	cc -c -fpic -D_$(BITS)_ -DDEBUG_OFF -DPTHREAD -D$(TRUERANDOM) $(WARNFLAGS) $(BASICFLAGS) -pthread $(MEMFLAGS) -otemp$(SLASH)entropy$(OBJ) entropy_lib.c
-	cc -c -fpic -D_$(BITS)_ -DDEBUG_OFF -DPTHREAD $(WARNFLAGS) $(BASICFLAGS) -pthread $(MEMFLAGS) -otemp$(SLASH)karacell$(OBJ) karacell_lib.c
-	cc -c -fpic -D_$(BITS)_ -DDEBUG_OFF -DPTHREAD $(WARNFLAGS) $(BASICFLAGS) -pthread $(MEMFLAGS) -otemp$(SLASH)listcrypt$(OBJ) listcrypt_lib.c
-	cc -c -fpic -D_$(BITS)_ -DDEBUG_OFF -DPTHREAD $(WARNFLAGS) $(BASICFLAGS) -pthread $(MEMFLAGS) -otemp$(SLASH)lmd$(OBJ) lmd_lib.c
-	cc -c -fpic -D_$(BITS)_ -DDEBUG_OFF -DPTHREAD $(WARNFLAGS) $(BASICFLAGS) -pthread $(MEMFLAGS) -otemp$(SLASH)spawn$(OBJ) spawn_lib.c
+	cc -c -fpic -D_$(BITS)_ -DDEBUG_OFF -DPTHREAD -D$(TRUERANDOM) $(WARNFLAGS) $(BASICFLAGS) -pthread $(MEMFLAGS) -otemp$(SLASH)entropy$(OBJ) entropy_obj.c
+	cc -c -fpic -D_$(BITS)_ -DDEBUG_OFF -DPTHREAD $(WARNFLAGS) $(BASICFLAGS) -pthread $(MEMFLAGS) -otemp$(SLASH)karacell$(OBJ) karacell_obj.c
+	cc -c -fpic -D_$(BITS)_ -DDEBUG_OFF -DPTHREAD $(WARNFLAGS) $(BASICFLAGS) -pthread $(MEMFLAGS) -otemp$(SLASH)listcrypt$(OBJ) listcrypt_obj.c
+	cc -c -fpic -D_$(BITS)_ -DDEBUG_OFF -DPTHREAD $(WARNFLAGS) $(BASICFLAGS) -pthread $(MEMFLAGS) -otemp$(SLASH)lmd$(OBJ) lmd_obj.c
+	cc -c -fpic -D_$(BITS)_ -DDEBUG_OFF -DPTHREAD $(WARNFLAGS) $(BASICFLAGS) -pthread $(MEMFLAGS) -otemp$(SLASH)spawn$(OBJ) spawn_obj.c
 	cc -shared -otemp$(SLASH)libkaracell.so $(JYTTEROBJ) temp$(SLASH)entropy$(OBJ) temp$(SLASH)karacell$(OBJ) temp$(SLASH)listcrypt$(OBJ) temp$(SLASH)lmd$(OBJ) temp$(SLASH)spawn$(OBJ)
 
 karacell_pipeline:
 	$(NASM)
-	cc -D_$(BITS)_ -DDEBUG_OFF -DPTHREAD_OFF -DPIPELINE -D$(TRUERANDOM) $(WARNFLAGS) $(BASICFLAGS) $(MEMFLAGS) $(JYTTEROBJ) -otemp$(SLASH)karacell$(EXE) main.c
+	cc -D_$(BITS)_ -DDEBUG_OFF -DPIPELINE -DPTHREAD_OFF -D$(TRUERANDOM) $(WARNFLAGS) $(BASICFLAGS) $(MEMFLAGS) $(JYTTEROBJ) -otemp$(SLASH)karacell$(EXE) main.c
 
 karacell_pipeline_pthread:
 	$(NASM)
-	cc -D_$(BITS)_ -DDEBUG_OFF -DPTHREAD -DPIPELINE -D$(TRUERANDOM) $(WARNFLAGS) $(BASICFLAGS) -pthread $(MEMFLAGS) $(JYTTEROBJ) -otemp$(SLASH)karacell$(EXE) main.c
+	cc -D_$(BITS)_ -DDEBUG_OFF -DPIPELINE -DPTHREAD -D$(TRUERANDOM) $(WARNFLAGS) $(BASICFLAGS) -pthread $(MEMFLAGS) $(JYTTEROBJ) -otemp$(SLASH)karacell$(EXE) main.c
 
 karacell_pthread:
 	$(NASM)
-	cc -D_$(BITS)_ -DDEBUG_OFF -DPTHREAD -DPIPELINE_OFF -D$(TRUERANDOM) $(WARNFLAGS) $(BASICFLAGS) -pthread $(MEMFLAGS) $(JYTTEROBJ) -otemp$(SLASH)karacell$(EXE) main.c
+	cc -D_$(BITS)_ -DDEBUG_OFF -DPIPELINE_OFF -DPTHREAD -D$(TRUERANDOM) $(WARNFLAGS) $(BASICFLAGS) -pthread $(MEMFLAGS) $(JYTTEROBJ) -otemp$(SLASH)karacell$(EXE) main.c

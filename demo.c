@@ -22,8 +22,8 @@ The functions in this file are for demonstration purposes, and are not part of t
 #include "entropy_xtrn.h"
 #include "listcrypt_xtrn.h"
 #include "lmd_xtrn.h"
-#include "print.c"
-#include "debug.c"
+#include "print_xtrn.h"
+#include "debug_xtrn.h"
 
 #define GARBAGE_U32_COUNT 12345
 
@@ -166,7 +166,6 @@ Please note, unless there's some desynchronization of file_idx between peers, th
 /*
 Allocate a data structure for Karacell. Unless you want to use different master keys for both directions of communication, which is much more awkward than simply alternating (file_idx)s, you can reuse this data structure indefinitely, so long as it never gets copied to untrusted storage.
 */
-  karacell_init();
   karacell_base=karacell_init();
 /*
 This next bit just allocates memory for cryption testing. You can delete this if you already have a string somewhere that you want to crypt. Let's allocate 12,345 (u32)s for the heck of it.
@@ -326,7 +325,7 @@ Notice how the format of listcrypt_u16_list_crypt() mirrors listcrypt_u32_list_c
 Do the same hack to copy the encrypted header and encrypted hash to the header and footer of the encrypted substring, just as in the u32 case above, but with LMD7 instead of LMD8.
 */
   memcpy((void *)(&u16_list_base[u16_idx_min-KARACELL_HEADER_U16_COUNT]),(const void *)(karacell_base->header_base),sizeof(karacell_header_t));
-  memcpy((void *)(&u16_list_base[u16_idx_min+u32_count]),(const void *)(&karacell_base->hash_xor_all[0]),LMD7_SIZE);
+  memcpy((void *)(&u16_list_base[u16_idx_min+u16_count]),(const void *)(&karacell_base->hash_xor_all[0]),LMD7_SIZE);
 /*
 ...and decrypt...
 */
@@ -377,7 +376,7 @@ Take an LMD2 for verification purposes below.
     exit(1);
   }
   memcpy((void *)(&u8_list_base[u8_idx_min-KARACELL_HEADER_SIZE]),(const void *)(karacell_base->header_base),sizeof(karacell_header_t));
-  memcpy((void *)(&u8_list_base[u8_idx_min+u32_count]),(const void *)(&karacell_base->hash_xor_all[0]),LMD8_SIZE);
+  memcpy((void *)(&u8_list_base[u8_idx_min+u8_count]),(const void *)(&karacell_base->hash_xor_all[0]),LMD8_SIZE);
   u8_idx_min-=KARACELL_HEADER_SIZE;
   u8_count+=KARACELL_HEADER_SIZE+LMD8_SIZE;
   hash_type=0;

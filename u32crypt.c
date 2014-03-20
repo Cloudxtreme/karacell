@@ -129,11 +129,11 @@ These shifts won't overflow because we know that the entire list fits in memory.
       }
     }
     tail_u32_count=(u32)(payload_size)>>U32_SIZE_LOG2;
+    tail_u32_count_minus_1=tail_u32_count-1;
 /*
 We need to crypt the tail block at tail_block_base because the hash region granularity is only guaranteed to be at most a multiple of KARACELL_BLOCK_SIZE. Only the first payload_size bytes need be defined.
 */
     if(tail_u32_count){
-      tail_u32_count_minus_1=tail_u32_count-1;
       karacell_u32_list_copy(u32_idx_min,u32_list_base,0,tail_block_base,tail_u32_count_minus_1);
     }
 /*

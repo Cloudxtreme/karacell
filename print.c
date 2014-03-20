@@ -20,6 +20,8 @@ You should have received a copy of the GNU Limited General Public
 License version 3 along with the Karacell 3 Library (filename
 "COPYING"). If not, see http://www.gnu.org/licenses/ .
 */
+#define PRINT_PRESENT 1
+
 const char *error_string_base="ERROR: ";
 const char *warning_string_base="WARNING: ";
 

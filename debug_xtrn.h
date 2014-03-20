@@ -21,8 +21,13 @@ License version 3 along with the Karacell 3 Library (filename
 "COPYING"). If not, see http://www.gnu.org/licenses/ .
 */
 /*
-LMD (extern)al Prototype Declaration. See lmd2.c, lmd7.c, and lmd8.c for full interface descriptions.
+Debugger Prototype Declaration. See debug.c for full interface descriptions.
 */
-extern u64 lmd_string_lmd2_custom_get(u32 lmd_c0,u32 lmd_x0,u8 *string_base,ULONG string_idx_min,u32 string_size);
-extern void lmd_block_lmd7_get(u32 block_base[LMD7_BLOCK_U32_COUNT],ULONG block_idx_min,u32 p_base[LMD7_U32_COUNT<<1],u32 z_base[LMD7_U32_COUNT]);
-extern void lmd_block_lmd8_get(u32 block_base[LMD8_BLOCK_U32_COUNT],ULONG block_idx_min,u32 p_base[LMD8_U32_COUNT<<1],u32 z_base[LMD8_U32_COUNT]);
+extern void debug_print(char *string_base);
+extern void debug_print_if(u8 status,char *string_base);
+extern void debug_ptr(char *name_base,void *base);
+extern void debug_string_print(char *context_string_base,u32 chunk_count,u8 *string_base,u8 chunk_size_log2);
+extern void debug_u8(char *name_base,u8 value);
+extern void debug_u16(char *name_base,u16 value);
+extern void debug_u32(char *name_base,u32 value);
+extern void debug_u64(char *name_base,u64 value);

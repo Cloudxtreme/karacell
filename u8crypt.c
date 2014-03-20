@@ -254,8 +254,8 @@ This code is equivalent to listcrypt_u32_list_crypt() with adaptations for conve
       payload_size-=(ULONG)(payload_block_idx_max)<<KARACELL_BLOCK_SIZE_LOG2;
     }
     tail_u8_count=(u32)(payload_size);
+    tail_u8_count_minus_1=tail_u8_count-1;
     if(tail_u8_count){
-      tail_u8_count_minus_1=tail_u8_count-1;
       listcrypt_u8_to_u32_list_copy(tail_u8_count_minus_1,u8_idx_min,u8_list_base,0,block_base);
     }
     karacell_tail_crypt(decrypt_status,karacell_base,payload_block_idx_max,(u32)(payload_size),0,block_base);

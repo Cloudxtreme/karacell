@@ -1296,13 +1296,13 @@ Out:
 /*
 You can expand this switch statement to deal with future hash types.
 */
+  hash_seed_u32_count=0;
+  hash_u32_count_minus_1=0;
   switch(hash_type){
   case KARACELL_HASH_TYPE_NONE:
-    hash_seed_u32_count=0;
 /*
 This is the one case where 0 means 0 (no hash).
 */
-    hash_u32_count_minus_1=0;
     break;   
   case KARACELL_HASH_TYPE_LMD8:
     hash_seed_u32_count=LMD8_U32_COUNT<<1;

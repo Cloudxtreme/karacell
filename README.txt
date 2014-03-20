@@ -87,6 +87,14 @@ FILE SUMMARY
 
   Debug infrastructure (compile with -DDEBUG).
 
+[debug_obj.c]
+
+  Main file for making debug.o(bj).
+
+[debug_xtrn.h]
+
+  C (extern)s for use with debug.o(bj).
+
 [demo.c]
 
   Demo encryption xor mask construction. When you run temp/demo, you should get a pile of text ending in "Yay! It's correct." This is followed by tests of the list (string) cryption apparatus, which performs Karacell operations on memory regions as opposed to files. These tests are well commented so as to illustrate the use of said list cryption functions.
@@ -95,13 +103,13 @@ FILE SUMMARY
 
   Demo of entropy factory for the purpose of generating initial values for Karacell. NOT part of the Karacell spec.
 
-[entropy_lib.c]
+[entropy_obj.c]
 
-  Main file for making libentropy.so.
+  Main file for making entropy.o(bj).
 
 [entropy_xtrn.h]
 
-  C (extern)s for use with libentropy.so.
+  C (extern)s for use with entropy.o(bj).
 
 [file_sys.c]
 [file_sys.h]
@@ -124,25 +132,25 @@ FILE SUMMARY
 
   However, a simplified JIT cryption interface is provided in u8crypt.c, u16crypt.c, and u32crypt.c.
 
-[karacell_lib.c]
+[karacell_obj.c]
 
-  Main file for making libkaracell.so.
+  Main file for making karacell.o(bj).
 
 [karacell_xtrn.h]
 
-  C (extern)s for use with libkaracell.so.
+  C (extern)s for use with karacell.o(bj).
 
 [listcrypt.c]
 
   Functions used by u8crypt.c, u16crypt.c, and u32crypt.c.
 
-[listcrypt_lib.c]
+[listcrypt_obj.c]
 
-  Main file for making liblistcrypt.so.
+  Main file for making listcrypt.o(bj).
 
 [listcrypt_xtrn.h]
 
-  C (extern)s for use with liblistcrypt.so.
+  C (extern)s for use with listcrypt.o(bj).
 
 [lmd2.c]
 [lmd2.h]
@@ -172,18 +180,26 @@ FILE SUMMARY
 
   Stupid text printing functions.
 
+[print_obj.c]
+
+  Main file for making print.o(bj).
+
+[print_xtrn.h]
+
+  C (extern)s for use with print.o(bj).
+
 [spawn.c]
 [spawn.h]
 
   Multithreading library. http://spawnthread.blogspot.com
 
-[spawn_lib.c]
+[spawn_obj.c]
 
-  Main file for making libspawn.so.
+  Main file for making spawn.o(bj).
 
 [spawn_xtrn.h]
 
-  C (extern)s for use with libspawn.so.
+  C (extern)s for use with spawn.o(bj).
 
 [table.h]
 

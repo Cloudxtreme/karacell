@@ -58,9 +58,10 @@ Out:
     int status;
 
     do{
-      status=(u32)(SecRandomCopyBytes(kSecRandomDefault,U32_SIZE,(u8 *)(&random));
+      status=(u32)(SecRandomCopyBytes(kSecRandomDefault,U32_SIZE,(u8 *)(&random)));
+      DEBUG_PRINT_IF(status,"WARNING: SecRandomCopyBytes() stalled, suggesting kernel entropy starvation.\n");
 /*
-The above call should never fail. If it does, we're either waiting for entropy to accrue, which is fine, or the platform is no longer fit to perform secure transactions, in which case we might as well hang and insprie the user to submit a bug report.
+The above call should never fail. If it does, we're either waiting for entropy to accrue, which is fine, or the platform is no longer fit to perform secure transactions, in which case we might as well hang and inspire the user to submit a bug report.
 */
     }while(status);
   #endif

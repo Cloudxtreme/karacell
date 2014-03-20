@@ -22,6 +22,7 @@ License version 3 along with the Karacell 3 Library (filename
 */
 #ifdef DEBUG
   #define DEBUG_PRINT(string_base) debug_print(string_base);
+  #define DEBUG_PRINT_IF(status,string_base) debug_print_if(status,string_base);
   #define DEBUG_PTR(name_base,value) debug_ptr(name_base,value);
   #define DEBUG_STRING_PRINT(context_string_base,chunk_count,string_base,chunk_size_log2) debug_string_print(context_string_base,chunk_count,string_base,chunk_size_log2);
   #define DEBUG_U16(name_base,value) debug_u16(name_base,value);
@@ -30,6 +31,7 @@ License version 3 along with the Karacell 3 Library (filename
   #define DEBUG_U8(name_base,value) debug_u8(name_base,value);
 #else
   #define DEBUG_PRINT(string_base)
+  #define DEBUG_PRINT_IF(status,string_base)
   #define DEBUG_PTR(name_base,value)
   #define DEBUG_STRING_PRINT(context_string_base,chunk_count,string_base,chunk_size_log2)
   #define DEBUG_U16(name_base,value)

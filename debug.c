@@ -21,6 +21,9 @@ License version 3 along with the Karacell 3 Library (filename
 "COPYING"). If not, see http://www.gnu.org/licenses/ .
 */
 #ifdef DEBUG
+#ifndef PRINT_PRESENT
+  #include "print_xtrn.h"
+#endif
 
 void
 debug_print_flush(void){
@@ -32,6 +35,14 @@ void
 debug_print(char *string_base){
   printf("%s",string_base);
   debug_print_flush();
+  return;
+}
+
+void
+debug_print_if(u8 status,char *string_base){
+  if(status){
+    debug_print(string_base);
+  }
   return;
 }
 
