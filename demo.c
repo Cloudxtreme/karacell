@@ -33,6 +33,7 @@ main(void){
   u32 entropy_list_base[KARACELL_MASTER_KEY_U32_COUNT_MAX];
   u64 file_idx;
   u32 garbage;
+  u32 hash_size;
   u8 hash_type;
   u32 iv_base[KARACELL_IV_U32_COUNT];
   u64 lmd2;
@@ -138,12 +139,12 @@ Set the maximum u32 index to the same value as mathematica.txt.
 /*
 Dump the xor mask  for comparison to Mathematica, which is just the ciphertext because the plaintext was 0. (We dump this first because it's huge and scrolls everything off the screen.)
 */
-  DEBUG_STRING_PRINT("xor_mask",xor_mask_idx_max+1,(u8 *)(xor_mask_base),2);
+  DEBUG_LIST_PRINT("xor_mask",xor_mask_idx_max+1,(u8 *)(xor_mask_base),2);
 /*
 Dump the tumblers as well.
 */
   tumbler_list_base=&thread_base->tumbler_list[0];
-  DEBUG_STRING_PRINT("tumbler_list",KARACELL_TUMBLER_COUNT_MAX,(u8 *)(tumbler_list_base),1);
+  DEBUG_LIST_PRINT("tumbler_list",KARACELL_TUMBLER_COUNT_MAX,(u8 *)(tumbler_list_base),1);
 /*
 Because the mask is long and difficult to compare, just check its LMD2 against what Mathematica computed.
 */
@@ -223,7 +224,7 @@ Let's encrypt the u32 list in the index range [51,9955]. In other words, u32_idx
 Take a quick LMD2 of the unencrypted substring, so we can verify that it decrypts properly after encryption.
 */
   lmd2=LMD_STRING_LMD2_GET((u8 *)(&u32_list_base[u32_idx_min]),0,(u32)(u32_count<<U32_SIZE_LOG2));
-  status=listcrypt_u32_list_crypt(entropy_list_base,file_idx,karacell_base,&hash_type,&u32_count,u32_idx_min,u32_list_base,&unauthenticated_status);
+  status=listcrypt_u32_list_crypt(entropy_list_base,file_idx,karacell_base,&hash_size,&hash_type,&u32_count,u32_idx_min,u32_list_base,&unauthenticated_status);
 /*
 (Note that hash_type, u32_count, and unauthenticated_status are not modified by encryption, only decryption.)
 
@@ -253,7 +254,7 @@ Now decrypt this junk. Back up u32_idx_min and adjust u32_count to reflect an en
 Set hash_type==0 in order to say that we want to decrypt.
 */
   hash_type=0;
-  status=listcrypt_u32_list_crypt(entropy_list_base,file_idx,karacell_base,&hash_type,&u32_count,u32_idx_min,u32_list_base,&unauthenticated_status);
+  status=listcrypt_u32_list_crypt(entropy_list_base,file_idx,karacell_base,&hash_size,&hash_type,&u32_count,u32_idx_min,u32_list_base,&unauthenticated_status);
 /*
 The following exception code could occur in real life, most likely due to karacell_header_decrypt() finding a consistency check failure in the header, or the hash failing to verify.
 */
@@ -316,7 +317,7 @@ Take an LMD2 for verification purposes below.
 /*
 Notice how the format of listcrypt_u16_list_crypt() mirrors listcrypt_u32_list_crypt(), but for the trivial type difference.
 */
-  status=listcrypt_u16_list_crypt(entropy_list_base,file_idx,karacell_base,&hash_type,&u16_count,u16_idx_min,u16_list_base,&unauthenticated_status);
+  status=listcrypt_u16_list_crypt(entropy_list_base,file_idx,karacell_base,&hash_size,&hash_type,&u16_count,u16_idx_min,u16_list_base,&unauthenticated_status);
   if(status){
     print_error("16-bit encryption failed");
     exit(1);
@@ -332,7 +333,7 @@ Do the same hack to copy the encrypted header and encrypted hash to the header a
   u16_idx_min-=KARACELL_HEADER_U16_COUNT;
   u16_count+=KARACELL_HEADER_U16_COUNT+(LMD7_U32_COUNT<<1);
   hash_type=0;
-  status=listcrypt_u16_list_crypt(entropy_list_base,file_idx,karacell_base,&hash_type,&u16_count,u16_idx_min,u16_list_base,&unauthenticated_status);
+  status=listcrypt_u16_list_crypt(entropy_list_base,file_idx,karacell_base,&hash_size,&hash_type,&u16_count,u16_idx_min,u16_list_base,&unauthenticated_status);
   if(status){
     print_error("16-bit decryption failed");
     exit(1);
@@ -370,7 +371,7 @@ Do it once more, this time for a u8 list with an LMD8 hash.
 Take an LMD2 for verification purposes below.
 */
   lmd2=LMD_STRING_LMD2_GET((u8 *)(&u8_list_base[u8_idx_min]),0,(u32)(u8_count));
-  status=listcrypt_u8_list_crypt(entropy_list_base,file_idx,karacell_base,&hash_type,&u8_count,u8_idx_min,u8_list_base,&unauthenticated_status);
+  status=listcrypt_u8_list_crypt(entropy_list_base,file_idx,karacell_base,&hash_size,&hash_type,&u8_count,u8_idx_min,u8_list_base,&unauthenticated_status);
   if(status){
     print_error("8-bit encryption failed");
     exit(1);
@@ -380,7 +381,7 @@ Take an LMD2 for verification purposes below.
   u8_idx_min-=KARACELL_HEADER_SIZE;
   u8_count+=KARACELL_HEADER_SIZE+LMD8_SIZE;
   hash_type=0;
-  status=listcrypt_u8_list_crypt(entropy_list_base,file_idx,karacell_base,&hash_type,&u8_count,u8_idx_min,u8_list_base,&unauthenticated_status);
+  status=listcrypt_u8_list_crypt(entropy_list_base,file_idx,karacell_base,&hash_size,&hash_type,&u8_count,u8_idx_min,u8_list_base,&unauthenticated_status);
   if(status){
     print_error("8-bit decryption failed");
     exit(1);

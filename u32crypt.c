@@ -26,7 +26,7 @@ u32 List Cryption for Karacell.
 The functions in this file are for convenience only, and are not part of the Karacell specification.
 */
 u8
-listcrypt_u32_list_crypt(u32 entropy_list_base[KARACELL_MASTER_KEY_U32_COUNT_MAX],u64 file_idx,karacell_t *karacell_base,u8 *hash_type_base,ULONG *u32_count_base,ULONG u32_idx_min,u32 *u32_list_base,u8 *unauthenticated_status_base){
+listcrypt_u32_list_crypt(u32 entropy_list_base[KARACELL_MASTER_KEY_U32_COUNT_MAX],u64 file_idx,karacell_t *karacell_base,u32 *hash_size_base,u8 *hash_type_base,ULONG *u32_count_base,ULONG u32_idx_min,u32 *u32_list_base,u8 *unauthenticated_status_base){
 /*
 Crypt a list of (u32)s.
 
@@ -37,6 +37,8 @@ In:
   file_idx is as defined in entropy_iv_make():In.
 
   *karacell_base is as defined in karacell_init():Out.
+
+  *hash_size_base is undefined.
 
   *hash_type_base is as defined in listcrypt_prepare():In:hash_type.
 
@@ -53,6 +55,8 @@ Out:
   Returns 1 on failure, else 0. Failure may result from a malformed or inconsistent header, an inconsistent hash, or a decrypted payload_size which is nonzero and not a multiple of U32_SIZE.
 
   *karacell_base is in need of refurbishment via karacell_rewind(). karacell_base->header_base is the base of the unencrypted header and karacell_base->hash_xor_all is the encrypted hash.
+
+  *hash_size_base is 0 if *unauthenticated_status_base is nonzero, else the size of the hash type indicated at *hash_type_base. 
 
   *hash_type_base is only changed in the case of decryption, in which case it's the unencrypted hash_type field from the Karacell header. See *unauthenticated_status_base for security considerations.
 
@@ -80,6 +84,7 @@ Out:
 This code was adapted from main.c, basically by removing all the OS calls and redundant code comments. The multithreading stuff does involve OS calls, but can be shunted to a monothreaded model (see PTHREAD_OFF in flag.h).
 */
   hash_type=*hash_type_base;
+  hash_size=0;
   status=listcrypt_prepare(&decrypt_status,hash_type,karacell_base);
   do{
     if(status){
@@ -158,5 +163,6 @@ hash_size is a multiple of U32_SIZE, so we're not losing information here.
       }
     }
   }while(0);
+  *hash_size_base=hash_size;
   return status;
 }

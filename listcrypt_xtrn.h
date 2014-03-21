@@ -29,8 +29,8 @@ extern u8 listcrypt_encrypt_prepare(u32 entropy_list_base[KARACELL_MASTER_KEY_U3
 extern u8 listcrypt_hash_check(u8 *hash_type_base,karacell_t *karacell_base);
 extern void listcrypt_u8_to_u32_list_copy(u32 u8_count_minus_1,ULONG u8_idx_min,u8 *u8_list_base,ULONG u32_idx_min,u32 *u32_list_base);
 extern void listcrypt_u32_to_u8_list_copy(u32 u8_count_minus_1,ULONG u8_idx_min,u8 *u8_list_base,ULONG u32_idx_min,u32 *u32_list_base);
-extern u8 listcrypt_u8_list_crypt(u32 entropy_list_base[KARACELL_MASTER_KEY_U32_COUNT_MAX],u64 file_idx,karacell_t *karacell_base,u8 *hash_type_base,ULONG *u8_count_base,ULONG u8_idx_min,u8 *u8_list_base,u8 *unauthenticated_status_base);
+extern u8 listcrypt_u8_list_crypt(u32 entropy_list_base[KARACELL_MASTER_KEY_U32_COUNT_MAX],u64 file_idx,karacell_t *karacell_base,u32 *hash_size_base,u8 *hash_type_base,ULONG *u8_count_base,ULONG u8_idx_min,u8 *u8_list_base,u8 *unauthenticated_status_base);
 extern void listcrypt_u16_to_u32_list_copy(u32 u16_count_minus_1,ULONG u16_idx_min,u16 *u16_list_base,ULONG u32_idx_min,u32 *u32_list_base);
 extern void listcrypt_u32_to_u16_list_copy(u32 u16_count_minus_1,ULONG u16_idx_min,u16 *u16_list_base,ULONG u32_idx_min,u32 *u32_list_base);
-extern u8 listcrypt_u16_list_crypt(u32 entropy_list_base[KARACELL_MASTER_KEY_U32_COUNT_MAX],u64 file_idx,karacell_t *karacell_base,u8 *hash_type_base,ULONG *u16_count_base,ULONG u16_idx_min,u16 *u16_list_base,u8 *unauthenticated_status_base);
-extern u8 listcrypt_u32_list_crypt(u32 entropy_list_base[KARACELL_MASTER_KEY_U32_COUNT_MAX],u64 file_idx,karacell_t *karacell_base,u8 *hash_type_base,ULONG *u32_count_base,ULONG u32_idx_min,u32 *u32_list_base,u8 *unauthenticated_status_base);
+extern u8 listcrypt_u16_list_crypt(u32 entropy_list_base[KARACELL_MASTER_KEY_U32_COUNT_MAX],u64 file_idx,karacell_t *karacell_base,u32 *hash_size_base,u8 *hash_type_base,ULONG *u16_count_base,ULONG u16_idx_min,u16 *u16_list_base,u8 *unauthenticated_status_base);
+extern u8 listcrypt_u32_list_crypt(u32 entropy_list_base[KARACELL_MASTER_KEY_U32_COUNT_MAX],u64 file_idx,karacell_t *karacell_base,u32 *hash_size_base,u8 *hash_type_base,ULONG *u32_count_base,ULONG u32_idx_min,u32 *u32_list_base,u8 *unauthenticated_status_base);

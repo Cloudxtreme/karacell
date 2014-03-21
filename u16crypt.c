@@ -103,7 +103,7 @@ Out:
 }
 
 u8
-listcrypt_u16_list_crypt(u32 entropy_list_base[KARACELL_MASTER_KEY_U32_COUNT_MAX],u64 file_idx,karacell_t *karacell_base,u8 *hash_type_base,ULONG *u16_count_base,ULONG u16_idx_min,u16 *u16_list_base,u8 *unauthenticated_status_base){
+listcrypt_u16_list_crypt(u32 entropy_list_base[KARACELL_MASTER_KEY_U32_COUNT_MAX],u64 file_idx,karacell_t *karacell_base,u32 *hash_size_base,u8 *hash_type_base,ULONG *u16_count_base,ULONG u16_idx_min,u16 *u16_list_base,u8 *unauthenticated_status_base){
 /*
 Crypt a list of (u16)s.
 
@@ -114,6 +114,8 @@ In:
   file_idx is as defined in entropy_iv_make():In.
 
   *karacell_base is as defined in karacell_init():Out.
+
+  *hash_size_base is undefined.
 
   *hash_type_base is as defined in listcrypt_prepare():In:hash_type.
 
@@ -130,6 +132,8 @@ Out:
   Returns 1 on failure, else 0. Failure may result from a malformed or inconsistent header, an inconsistent hash, or a decrypted payload_size which is nonzero and not a multiple of U16_SIZE.
 
   *karacell_base is defined in listcrypt_u32_list_crypt():Out.
+
+  *hash_size_base is as defined in listcrypt_u32_list_crypt():Out.
 
   *hash_type_base is defined in listcrypt_u32_list_crypt():Out.
 
@@ -162,6 +166,7 @@ Out:
 This code is equivalent to listcrypt_u32_list_crypt() with adaptations for converting u16 to u32.
 */
   hash_type=*hash_type_base;
+  hash_size=0;
   status=listcrypt_prepare(&decrypt_status,hash_type,karacell_base);
   do{
     if(status){
@@ -208,8 +213,9 @@ This code is equivalent to listcrypt_u32_list_crypt() with adaptations for conve
             karacell_hash_get(0,karacell_base,thread_base,0,block_base,KARACELL_BLOCK_SIZE);
           }
         }
-        u16_idx_min+=KARACELL_BLOCK_U16_COUNT;
         karacell_subblock_crypt(karacell_base,thread_base,KARACELL_TUMBLER_BIAS_CRYPT,KARACELL_BLOCK_U32_COUNT-1,0,block_base);
+        listcrypt_u32_to_u16_list_copy(KARACELL_BLOCK_U16_COUNT-1,u16_idx_min,u16_list_base,0,block_base);
+        u16_idx_min+=KARACELL_BLOCK_U16_COUNT;
         if(KARACELL_HASH_TYPE_NONE<hash_type){
           if(decrypt_status){
             karacell_hash_get(0,karacell_base,thread_base,0,block_base,KARACELL_BLOCK_SIZE);
@@ -239,5 +245,6 @@ This code is equivalent to listcrypt_u32_list_crypt() with adaptations for conve
       }
     }
   }while(0);
+  *hash_size_base=hash_size;
   return status;
 }

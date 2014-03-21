@@ -53,19 +53,24 @@ The functions in this file are for demonstration purposes, and are not part of t
 #include "trng.c"
 #include "entropy.c"
 #include "ascii.c"
+#include "listcrypt.c"
+#include "u8crypt.c"
+#include "u16crypt.c"
+#include "u32crypt.c"
 
 int
 main(int argc, char *argv[]){
   u8 authentication_fail_status;
   u64 block_idx_minus_1;
   ULONG burst_size;
+  u32 crypt_mode;
   u8 decrypt_status;
   u32 entropy_list_base[KARACELL_MASTER_KEY_U32_COUNT_MAX];
   u8 entropy_spawn_status;
   FILE *handle_in;
   FILE *handle_out;
-  u8 hash_type;
   u32 hash_size;
+  u8 hash_type;
   u32 hash_xor_all_base[KARACELL_HASH_U32_COUNT_MAX];
   karacell_header_t *header_base;
   u8 header_status;
@@ -78,11 +83,18 @@ main(int argc, char *argv[]){
   u8 *overwrite_status_base;
   u32 *payload_base;
   u64 payload_block_idx_max;
+  ULONG payload_idx;
   u64 payload_size;
+  u16 *payload_u16_base;
+  u8 *payload_u8_base;
   ULONG precrypt_block_idx_max;
   u8 status;
   spawn_t *spawn_base;
   u8 tumbler_idx_max;
+  ULONG u16_count;
+  ULONG u32_count;
+  ULONG u8_count;
+  u8 unauthenticated_status;
 
   status=1;
   authentication_fail_status=0;
@@ -154,13 +166,18 @@ If mode was null then we can't read the memory at mode_base[1], so be careful. I
     }
     hash_type=mode;
     decrypt_status=0;
+    hash_size=0;
     switch(mode){
     case 0:
       decrypt_status=1;
       break;
     case KARACELL_HASH_TYPE_NONE:
+      break;
     case KARACELL_HASH_TYPE_LMD8:
+      hash_size=LMD8_SIZE;
+      break;
     case KARACELL_HASH_TYPE_LMD7:
+      hash_size=LMD7_SIZE;
       break;
     default:
       status=1;
@@ -209,6 +226,169 @@ If overwrite_status was null then we can't read the memory at overwrite_status_b
     }
     header_base=karacell_base->header_base;
     karacell_master_key_set(karacell_base,master_key_base,0,tumbler_idx_max);
+    status=file_size_get_rewind(handle_in,&payload_size);
+    if(status){
+      print_error_input_file();
+      break;
+    }
+DEBUG_U64("payload_size",payload_size);
+crypt_mode=true_random_get()&3;
+switch(crypt_mode){
+case 0:
+  if(!(payload_size&U32_BYTE_MAX)){
+    u32_count=(ULONG)(payload_size)>>U32_SIZE_LOG2;
+    DEBUG_U64("payload_size",payload_size);
+    payload_base=(u32 *)(karacell_malloc((ULONG)(payload_size-1)));
+    if(!payload_base){
+      print_error_no_memory();
+      break;
+    }   
+    status=file_read(payload_size,(u8 *)(payload_base),handle_in);
+    if(status){
+      print_error_input_file();
+      exit(1);
+    }
+    entropy_make(entropy_list_base);
+    status=listcrypt_u32_list_crypt(entropy_list_base,0,karacell_base,&hash_size,&hash_type,&u32_count,0,payload_base,&unauthenticated_status);
+    if(status){
+      print_error_input_file();
+      exit(1);
+    }
+    if(decrypt_status&&unauthenticated_status){
+      printf("WARNING: Unauthenticated hash.\n");
+    }
+    payload_size=(u64)(u32_count)<<U32_SIZE_LOG2;
+    if(!decrypt_status){
+      status=file_write(sizeof(karacell_header_t),(u8 *)(header_base),handle_out);
+      if(status){
+        print_error_output_file();
+        exit(1);
+      }
+    }
+    payload_idx=0;
+    if(decrypt_status){
+      payload_idx=KARACELL_HEADER_SIZE>>U32_SIZE_LOG2;
+    }
+    status=file_write(payload_size,(u8 *)(&payload_base[payload_idx]),handle_out);
+    if(status){
+      print_error_output_file();
+      exit(1);
+    }
+    if(!decrypt_status){
+      status=file_write(hash_size,(u8 *)(&karacell_base->hash_xor_all[0]),handle_out);
+      if(status){
+        print_error_output_file();
+        exit(1);
+      }
+    }
+    DEBUG_LIST_PRINT("iv",KARACELL_IV_U32_COUNT,(u8 *)(&karacell_base->header_base->iv[0]),2);
+    DEBUG_U32("hash_size",hash_size);
+    DEBUG_U32("crypt_mode",crypt_mode);
+    exit(0);
+  }
+case 1:
+  if(!(payload_size&U16_BYTE_MAX)){
+    u16_count=(ULONG)(payload_size)>>U16_SIZE_LOG2;
+    DEBUG_U64("payload_size",payload_size);
+    payload_u16_base=(u16 *)(karacell_malloc((ULONG)(payload_size-1)));
+    if(!payload_u16_base){
+      print_error_no_memory();
+      break;
+    }   
+    status=file_read(payload_size,(u8 *)(payload_u16_base),handle_in);
+    if(status){
+      print_error_input_file();
+      exit(1);
+    }
+    entropy_make(entropy_list_base);
+    status=listcrypt_u16_list_crypt(entropy_list_base,0,karacell_base,&hash_size,&hash_type,&u16_count,0,payload_u16_base,&unauthenticated_status);
+    if(status){
+      print_error_input_file();
+      exit(1);
+    }
+    if(decrypt_status&&unauthenticated_status){
+      printf("WARNING: Unauthenticated hash.\n");
+    }
+    payload_size=(u64)(u16_count)<<U16_SIZE_LOG2;
+    if(!decrypt_status){
+      status=file_write(sizeof(karacell_header_t),(u8 *)(header_base),handle_out);
+      if(status){
+        print_error_output_file();
+        exit(1);
+      }
+    }
+    payload_idx=0;
+    if(decrypt_status){
+      payload_idx=KARACELL_HEADER_SIZE>>U16_SIZE_LOG2;
+    }
+    status=file_write(payload_size,(u8 *)(&payload_u16_base[payload_idx]),handle_out);
+    if(status){
+      print_error_output_file();
+      exit(1);
+    }
+    if(!decrypt_status){
+      status=file_write(hash_size,(u8 *)(&karacell_base->hash_xor_all[0]),handle_out);
+      if(status){
+        print_error_output_file();
+        exit(1);
+      }
+    }
+    DEBUG_LIST_PRINT("iv",KARACELL_IV_U32_COUNT,(u8 *)(&karacell_base->header_base->iv[0]),2);
+    DEBUG_U32("hash_size",hash_size);
+    DEBUG_U32("crypt_mode",crypt_mode);
+    exit(0);
+  }
+case 2:
+  u8_count=(ULONG)(payload_size);
+  DEBUG_U64("payload_size",payload_size);
+  payload_u8_base=(u8 *)(karacell_malloc((ULONG)(payload_size-1)));
+  if(!payload_u8_base){
+    print_error_no_memory();
+    break;
+  }   
+  status=file_read(payload_size,(u8 *)(payload_u8_base),handle_in);
+  if(status){
+    print_error_input_file();
+    exit(1);
+  }
+  entropy_make(entropy_list_base);
+  status=listcrypt_u8_list_crypt(entropy_list_base,0,karacell_base,&hash_size,&hash_type,&u8_count,0,payload_u8_base,&unauthenticated_status);
+  if(status){
+    print_error_input_file();
+    exit(1);
+  }
+  if(decrypt_status&&unauthenticated_status){
+    printf("WARNING: Unauthenticated hash.\n");
+  }
+  payload_size=(u64)(u8_count);
+  if(!decrypt_status){
+    status=file_write(sizeof(karacell_header_t),(u8 *)(header_base),handle_out);
+    if(status){
+      print_error_output_file();
+      exit(1);
+    }
+  }
+  payload_idx=0;
+  if(decrypt_status){
+    payload_idx=KARACELL_HEADER_SIZE;
+  }
+  status=file_write(payload_size,(u8 *)(&payload_u8_base[payload_idx]),handle_out);
+  if(status){
+    print_error_output_file();
+    exit(1);
+  }
+  if(!decrypt_status){
+    status=file_write(hash_size,(u8 *)(&karacell_base->hash_xor_all[0]),handle_out);
+    if(status){
+      print_error_output_file();
+      exit(1);
+    }
+  }
+  DEBUG_LIST_PRINT("iv",KARACELL_IV_U32_COUNT,(u8 *)(&karacell_base->header_base->iv[0]),2);
+  DEBUG_U32("hash_size",hash_size);
+  DEBUG_U32("crypt_mode",crypt_mode);
+  exit(0);
+case 3:
     if(!decrypt_status){
 /*
 Go make *entropy_list_base in another thread, which will cause it to run faster due to increased timing entropy.
@@ -219,11 +399,6 @@ Go make *entropy_list_base in another thread, which will cause it to run faster 
         break;
       }
       entropy_spawn_status=1;
-    }
-    status=file_size_get_rewind(handle_in,&payload_size);
-    if(status){
-      print_error_input_file();
-      break;
     }
     if(decrypt_status){
       status=karacell_header_size_check(payload_size);
@@ -434,6 +609,8 @@ Write the encrypted hash.
         }
       }
     }
+  DEBUG_U32("crypt_mode",crypt_mode);
+}
 /*
 If we were going to crypt another file, we would need to call karacell_rewind() at this point.
 */

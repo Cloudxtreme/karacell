@@ -47,7 +47,7 @@ debug_print_if(u8 status,char *string_base){
 }
 
 void
-debug_string_print_custom(char *context_string_base,u32 chunk_count,u8 *string_base,u8 chunk_size_log2,u8 backwards,u8 compilable){
+debug_list_print_custom(char *context_string_base,u32 chunk_count,u8 *list_base,u8 chunk_size_log2,u8 backwards,u8 compilable){
   u8 char_array_base[2+(8*11)+4];
   u8 char_array_idx;
   u8 char_array_idx_delta;
@@ -65,7 +65,7 @@ debug_string_print_custom(char *context_string_base,u32 chunk_count,u8 *string_b
       printf("%s \\",context_string_base);
     }
     print_new_line();
-    if(string_base){
+    if(list_base){
       row_count=4;
       column_count=0x10;
       if(chunk_size_log2>1){
@@ -96,16 +96,16 @@ debug_string_print_custom(char *context_string_base,u32 chunk_count,u8 *string_b
           }
           switch(chunk_size_log2){
           case 0:
-            sprintf((char *)(char_array_base+char_array_idx),"%02X,",string_base[k]);
+            sprintf((char *)(char_array_base+char_array_idx),"%02X,",list_base[k]);
             break;
           case 1:
-            sprintf((char *)(char_array_base+char_array_idx),"%04X,",*(u16 *)(string_base+k));
+            sprintf((char *)(char_array_base+char_array_idx),"%04X,",*(u16 *)(list_base+k));
             break;
           case 2:
-            sprintf((char *)(char_array_base+char_array_idx),"%08X,",*(u32 *)(string_base+k));
+            sprintf((char *)(char_array_base+char_array_idx),"%08X,",*(u32 *)(list_base+k));
             break;
           case 3:
-            sprintf((char *)(char_array_base+char_array_idx),"%08X%08X,",*(u32 *)(string_base+k+U32_SIZE),*(u32 *)(string_base+k));
+            sprintf((char *)(char_array_base+char_array_idx),"%08X%08X,",*(u32 *)(list_base+k+U32_SIZE),*(u32 *)(list_base+k));
             break;
           }
           char_array_idx=(u8)(char_array_idx+char_array_idx_delta);
@@ -129,11 +129,11 @@ debug_string_print_custom(char *context_string_base,u32 chunk_count,u8 *string_b
       }
       print_new_line();
     }else{
-      printf("\ndebug_string_print_custom(): String has NULL base.\n");
+      printf("\ndebug_list_print_custom(): List has NULL base.\n");
       exit(1);
     }
   }else{
-    printf("\ndebug_string_print_custom(): chunk_size_log2>%d.\n",U64_SIZE_LOG2);
+    printf("\ndebug_list_print_custom(): chunk_size_log2>%d.\n",U64_SIZE_LOG2);
     exit(1);
   }
   debug_print_flush();
@@ -141,8 +141,8 @@ debug_string_print_custom(char *context_string_base,u32 chunk_count,u8 *string_b
 }
 
 void
-debug_string_print(char *context_string_base,u32 chunk_count,u8 *string_base,u8 chunk_size_log2){
-  debug_string_print_custom(context_string_base,chunk_count,string_base,chunk_size_log2,0,0);
+debug_list_print(char *context_string_base,u32 chunk_count,u8 *list_base,u8 chunk_size_log2){
+  debug_list_print_custom(context_string_base,chunk_count,list_base,chunk_size_log2,0,0);
   return;
 }
 
