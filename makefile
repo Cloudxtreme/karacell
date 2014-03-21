@@ -77,10 +77,6 @@ karacell_debug_pipeline_pthread:
 	$(NASM)
 	cc -D_$(BITS)_ -DDEBUG -DPIPELINE -DPTHREAD -D$(TRUERANDOM) $(WARNFLAGS) $(BASICFLAGS) -pthread $(MEMFLAGS) $(JYTTEROBJ) -otemp$(SLASH)karacell$(EXE) main.c
 
-test:
-	$(NASM)
-	cc -D_$(BITS)_ -DDEBUG -DPIPELINE -DPTHREAD -D$(TRUERANDOM) $(WARNFLAGS) $(BASICFLAGS) -pthread $(MEMFLAGS) $(JYTTEROBJ) -otemp$(SLASH)test$(EXE) test.c
-
 karacell_debug_pthread:
 	$(NASM)
 	cc -D_$(BITS)_ -DDEBUG -DPIPELINE_OFF -DPTHREAD -D$(TRUERANDOM) $(WARNFLAGS) $(BASICFLAGS) -pthread $(MEMFLAGS) $(JYTTEROBJ) -otemp$(SLASH)karacell$(EXE) main.c
