@@ -20,5 +20,3 @@ script:
   - make karacell_pipeline
   - make karacell_pipeline_pthread
   - make karacell_pthread
-  - make test
-  
